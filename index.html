@@ -293,9 +293,14 @@ function renderConsole(app, code){
   const ctrl=el('div',{class:'card'},
     el('div',{class:'row'},
       el('div',{}, el('h2',{id:'h_title'},'載入中…'), el('div',{class:'muted small',id:'h_sub'},'')),
-      el('div',{style:'flex:0 0 auto'}, el('button',{class:'ghost sm',onclick:()=>{
-        if(confirm('結束本堂並回到首頁？資料仍保留在資料庫中。')){localStorage.removeItem('cp_teacher_session');teacherApp();}
-      }},'結束本堂'))
+      el('div',{style:'flex:0 0 auto;display:flex;gap:8px'},
+        el('button',{class:'ghost sm',onclick:()=>{
+          if(confirm('結束本堂並回到首頁？資料仍保留在資料庫中。')){localStorage.removeItem('cp_teacher_session');teacherApp();}
+        }},'結束本堂'),
+        el('button',{class:'warn sm',onclick:async()=>{
+          if(confirm('確定刪除本堂（'+code+'）的所有資料？此動作無法復原。')&&confirm('再次確認：將永久刪除本堂的簽到、作答與統計記錄。')){
+            await DB.set('sessions/'+code,null);localStorage.removeItem('cp_teacher_session');toast('已刪除本堂資料');teacherApp();}
+        }},'🗑 刪除本堂'))
     )
   );
   app.appendChild(ctrl);
@@ -710,9 +715,13 @@ function renderConsole(app, code){
       el('div',{class:'row',style:'align-items:center'},
         el('div',{}, el('h2',{style:'margin:0'},'跨週累計儀表　'+course),
           el('div',{class:'muted small'}, totalWeeks+' 週 · '+list.length+' 位學生')),
-        el('div',{style:'flex:0 0 auto;display:flex;gap:8px'},
+        el('div',{style:'flex:0 0 auto;display:flex;gap:8px;flex-wrap:wrap'},
           el('button',{class:'ghost sm',onclick:loadCross},'↻ 重新整理'),
-          el('button',{class:'ghost sm',onclick:()=>exportCross(list,weeks,course)},'⬇ CSV')))
+          el('button',{class:'ghost sm',onclick:()=>exportCross(list,weeks,course)},'⬇ CSV'),
+          el('button',{class:'warn sm',onclick:async()=>{
+            if(confirm('⚠️ 清空資料庫中「所有課程、所有週次」的全部記錄？此動作無法復原，僅供測試後重置。')&&confirm('最後確認：真的要刪除全部課堂資料嗎？')){
+              await DB.set('sessions',null);localStorage.removeItem('cp_teacher_session');toast('已清空所有資料');teacherApp();}
+          }},'🗑 清空所有資料')))
     ));
 
     if(!sessions.length){body.appendChild(el('div',{class:'card'},el('div',{class:'muted'},'尚無同課程資料。')));return;}
