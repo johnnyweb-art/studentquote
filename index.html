@@ -30,7 +30,7 @@
   .card h3{margin:0 0 8px;font-size:14px;color:var(--muted);font-weight:600}
   label{display:block;font-size:13px;color:var(--muted);margin:10px 0 6px}
   input,textarea,select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
-    background:var(--panel2);color:var(--ink);font-size:15px;outline:none}
+    background:var(--panel2);color:var(--ink);font-size:15px;outline:none;font-family:inherit}
   input:focus,textarea:focus{border-color:var(--brand)}
   textarea{min-height:80px;resize:vertical}
   .row{display:flex;gap:10px;flex-wrap:wrap}
@@ -42,6 +42,7 @@
   button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
   button.warn{background:linear-gradient(135deg,#f59e0b,#ef4444)}
   button.ok{background:linear-gradient(135deg,#10b981,#059669)}
+  button.sm{padding:8px 12px;font-size:13px;width:auto}
   button:disabled{opacity:.5;cursor:not-allowed}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   @media(max-width:760px){.grid2{grid-template-columns:1fr}}
@@ -51,6 +52,8 @@
   .small{font-size:12px}
   .timer{font-size:64px;font-weight:900;text-align:center;line-height:1.1}
   .timer.run{color:var(--ok)} .timer.low{color:var(--warn)} .timer.end{color:var(--bad)}
+  @keyframes flash{0%,100%{opacity:1}50%{opacity:.35}}
+  .timer.low{animation:flash .6s infinite}
   .bar{height:10px;background:var(--panel2);border-radius:999px;overflow:hidden;margin-top:8px}
   .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));transition:width .9s linear}
   table{width:100%;border-collapse:collapse;font-size:14px}
@@ -58,6 +61,8 @@
   th{color:var(--muted);font-weight:600;font-size:12px}
   .chip{display:inline-block;font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
   .chip.ok{color:var(--ok);border-color:#1f6b53} .chip.no{color:var(--muted)}
+  .chip.late{color:var(--warn);border-color:#5b4a2e}
+  .chip.grp{color:var(--brand);border-color:#2e3f7e}
   .stu-grid{display:flex;flex-wrap:wrap;gap:8px}
   .stu{padding:8px 12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-size:14px;
     display:flex;align-items:center;gap:8px}
@@ -67,17 +72,39 @@
   .toast.show{opacity:1}
   .hide{display:none!important}
   .kpi{display:flex;gap:12px;flex-wrap:wrap}
-  .kpi .box{flex:1;min-width:120px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+  .kpi .box{flex:1;min-width:110px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
   .kpi .n{font-size:28px;font-weight:900;color:var(--brand)}
   .kpi .l{font-size:12px;color:var(--muted);margin-top:4px}
   .banner{background:#2a2140;border:1px solid #5b4a2e;color:#fbbf24;padding:10px 14px;border-radius:12px;font-size:13px;margin-bottom:14px}
-  .seg{display:flex;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:4px}
-  .seg button{flex:1;background:transparent;color:var(--muted);font-size:13px;padding:8px}
+  .seg{display:flex;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:4px;flex-wrap:wrap}
+  .seg button{flex:1;background:transparent;color:var(--muted);font-size:13px;padding:8px;min-width:84px}
   .seg button.active{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
   .answer-card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}
   .answer-card .who{font-weight:700;font-size:13px}
   .answer-card .txt{margin-top:4px;font-size:15px}
   .answer-card .meta{font-size:11px;color:var(--muted);margin-top:4px}
+  /* 長條圖 */
+  .vbar{display:flex;align-items:center;gap:10px;margin:6px 0}
+  .vbar .lab{width:42px;font-weight:800;color:var(--brand)}
+  .vbar .track{flex:1;height:22px;background:var(--panel2);border-radius:8px;overflow:hidden}
+  .vbar .fill{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:8px;transition:width .5s}
+  .vbar .cnt{width:64px;text-align:right;color:var(--muted);font-size:13px}
+  /* 文字雲 */
+  .cloud{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;padding:6px 0}
+  .cloud span{line-height:1.1;color:var(--ink)}
+  /* 理解度儀表 */
+  .pulse{display:flex;gap:12px}
+  .pulse .seg2{flex:1;border-radius:12px;border:1px solid var(--line);padding:12px;text-align:center;background:var(--panel2)}
+  .pulse .seg2.ok{border-color:#1f6b53} .pulse .seg2.lost{border-color:#5b4a2e}
+  .pulse .big2{font-size:26px;font-weight:900}
+  .pbtns{display:flex;gap:10px}
+  .pbtns button{font-size:16px}
+  .pbtns .lost{background:linear-gradient(135deg,#f59e0b,#ef4444)}
+  .pbtns .selected{outline:3px solid #fff;outline-offset:2px}
+  details{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:12px}
+  summary{cursor:pointer;font-weight:700;font-size:14px}
+  .heat{font-weight:800}
+  .heat.lo{color:var(--bad)} .heat.mid{color:var(--warn)} .heat.hi{color:var(--ok)}
 </style>
 </head>
 <body>
@@ -86,16 +113,14 @@
 
 <script>
 /* ============================================================
-   ClassPulse 課堂脈動
-   單檔課堂互動系統：QR 簽到 / 限時搶答 / 即時統計
-   作者：為 Johnny 教授 1151 管理學課程客製
+   ClassPulse 課堂脈動  v2
+   單檔課堂互動系統
+   QR 簽到（名單驗證／時間窗／防代簽 PIN）｜限時搶答（可修改）
+   即時圖表・文字雲｜理解度回饋｜出場券｜題庫｜小組競賽｜跨週儀表
+   為 Johnny 教授 1151 管理學課程客製
    ============================================================ */
 
-/* ---------- 1. Firebase 設定 ----------
-   到 https://console.firebase.google.com 建立專案後，
-   貼上你的設定取代下方占位字串即可啟用「多裝置即時連線」。
-   未填寫時自動進入「本機示範模式」（同一裝置多分頁可測試）。
-*/
+/* ---------- 1. Firebase 設定 ---------- */
 const firebaseConfig = {
   apiKey: "AIzaSyB9gbpyyxkHsjcd2TH1Vc2qO5AxTJfawbE",
   authDomain: "classpulse-77f5b.firebaseapp.com",
@@ -105,11 +130,9 @@ const firebaseConfig = {
   messagingSenderId: "386329847096",
   appId: "1:386329847096:web:3f04c4c101f48df2fb4dcd"
 };
-
 const USE_FIREBASE = !firebaseConfig.apiKey.startsWith("PASTE_");
 
-/* ---------- 2. 資料層抽象 (DB) ----------
-   提供 set/update/push/get/onValue，兩種後端共用同一介面。 */
+/* ---------- 2. 資料層抽象 (DB) ---------- */
 const DB = (function(){
   if(USE_FIREBASE){
     firebase.initializeApp(firebaseConfig);
@@ -123,7 +146,6 @@ const DB = (function(){
       onValue:(p,cb)=>{const ref=db.ref(p);const h=ref.on('value',s=>cb(s.val()));return ()=>ref.off('value',h);}
     };
   }
-  /* 本機示範模式：localStorage + BroadcastChannel(跨分頁) + 輪詢 */
   const KEY="classpulse_local";
   const ch = ("BroadcastChannel" in window) ? new BroadcastChannel("classpulse") : null;
   const subs=[];
@@ -136,7 +158,7 @@ const DB = (function(){
   function notify(){const o=read();subs.forEach(s=>{try{s.cb(getPath(o,s.path)??null)}catch(e){}});}
   if(ch)ch.onmessage=()=>notify();
   window.addEventListener('storage',e=>{if(e.key===KEY)notify();});
-  setInterval(notify,1200); // 保險輪詢，確保倒數同步
+  setInterval(notify,1200);
   return {
     mode:"local",
     set:(p,v)=>{const o=read();setPath(o,p,v);write(o);return Promise.resolve();},
@@ -158,15 +180,46 @@ function now(){return Date.now();}
 function qparam(k){return new URLSearchParams(location.search).get(k);}
 function randCode(){return Math.random().toString(36).slice(2,7).toUpperCase();}
 function fmtTime(ts){const d=new Date(ts);return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}
+function esc(s){return (s==null?'':String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 
 /* 計分規則（可調整）*/
-const PTS={checkin:1, answer:2, intime:1};
+const PTS={checkin:1, answer:2, intime:1, exit:1};
 
-/* ---------- 4. 路由：學生端 vs 教師端 ---------- */
+/* 防代簽 PIN：依時間區間(20秒)與課堂代碼計算，師生兩端同步 */
+function pinSlot(){return Math.floor(now()/20000);}
+function pinFor(code,slot){let h=0;const s=code+'|'+slot;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;}return (h%10000).toString().padStart(4,'0');}
+function pinValid(code,input){const sl=pinSlot();return input===pinFor(code,sl)||input===pinFor(code,sl-1);}
+
+/* 音效（倒數嗶聲）*/
+let _ac=null;
+function muted(){return localStorage.getItem('cp_mute')==='1';}
+function beep(freq,dur){if(muted())return;try{_ac=_ac||new (window.AudioContext||window.webkitAudioContext)();
+  const o=_ac.createOscillator(),g=_ac.createGain();o.frequency.value=freq||880;o.connect(g);g.connect(_ac.destination);
+  g.gain.setValueAtTime(0.0001,_ac.currentTime);g.gain.exponentialRampToValueAtTime(0.18,_ac.currentTime+0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001,_ac.currentTime+(dur||0.12));o.start();o.stop(_ac.currentTime+(dur||0.12));}catch(e){}}
+
+/* 中文/英數斷詞 → 詞頻（給文字雲）*/
+const STOP=new Set(('的 是 了 和 與 在 我 你 他 她 它 們 也 都 就 而 以 為 對 或 一 這 那 有 不 很 要 把 被 給 到 從 並 之 等 會 能 可 但 然 後 因 所 如 中 上 下 個 我們 你們 他們 一個 可以 因為 所以 而且 以及 還有 一種 一門 旨在').split(/\s+/));
+function tokenize(str){
+  const cleaned=(str||'').replace(/[，。、！？；：「」『』（）()\[\]【】《》〈〉～·\s,.!?;:'"#@\/\\\-_=+*0-9]/g,' ');
+  const parts=cleaned.split(/\s+/).filter(Boolean);
+  const toks=[];
+  parts.forEach(p=>{
+    if(/^[a-zA-Z]+$/.test(p)){ if(p.length>=2)toks.push(p.toLowerCase()); return; }
+    const chars=[...p];
+    if(chars.length===1){ if(!STOP.has(chars[0]))toks.push(chars[0]); return; }
+    for(let i=0;i<chars.length-1;i++){const bg=chars[i]+chars[i+1];
+      if(!STOP.has(chars[i])&&!STOP.has(chars[i+1])&&!STOP.has(bg))toks.push(bg);}
+  });
+  return toks;
+}
+function freqTop(texts,n){const m={};texts.forEach(t=>tokenize(t).forEach(w=>m[w]=(m[w]||0)+1));
+  return Object.entries(m).filter(([w,c])=>c>=1).sort((a,b)=>b[1]-a[1]).slice(0,n||30);}
+
+/* ---------- 4. 路由 ---------- */
 const sid = qparam('s');
 if(sid){ studentApp(sid); } else { teacherApp(); }
 
-/* 通用頂部 */
 function header(sub){
   return el('div',{class:'topbar'},
     el('div',{class:'brand'}, el('div',{class:'logo'},'⚡'), 'ClassPulse', el('span',{class:'muted small',style:'font-weight:400'},'課堂脈動')),
@@ -182,31 +235,50 @@ function teacherApp(){
   let session = localStorage.getItem('cp_teacher_session');
   app.innerHTML='';
   app.appendChild(header('教師端'));
-
   if(DB.mode==='local'){
     app.appendChild(el('div',{class:'banner'},
-      '目前為本機示範模式（尚未設定 Firebase）。可在同一台電腦開多個分頁模擬師生，正式跨裝置請依指南填入 Firebase 設定。'));
+      '目前為本機示範模式（尚未設定 Firebase）。正式跨裝置請依指南填入 Firebase 設定。'));
   }
-
-  if(!session){ renderCreate(app); }
-  else { renderConsole(app, session); }
+  if(!session){ renderCreate(app); } else { renderConsole(app, session); }
 }
 
 function renderCreate(app){
-  let course='', week='1';
   const card=el('div',{class:'card'},
     el('h2',{},'開始一堂新課'),
     el('label',{},'課程名稱'),
     el('input',{id:'c_course',placeholder:'例：管理學 (一)',value:'管理學'}),
     el('label',{},'第幾週 / 節次'),
     el('input',{id:'c_week',type:'number',value:'1',min:'1'}),
-    el('div',{style:'height:14px'}),
+    el('div',{style:'height:6px'}),
+    el('details',{},
+      el('summary',{},'進階（選用）：學生名單與分組'),
+      el('div',{style:'height:8px'}),
+      el('label',{},'班級名單（每行一位：學號,姓名 或 學號,姓名,組別）'),
+      el('textarea',{id:'c_roster',placeholder:'1100001,王小明\n1100002,陳大華,A\n1100003,林美麗,B'}),
+      el('div',{class:'row',style:'margin-top:8px;align-items:center'},
+        el('label',{style:'margin:0;flex:2'},
+          el('input',{id:'c_strict',type:'checkbox',style:'width:auto;margin-right:6px'}),'嚴格模式：僅名單內學號可簽到'),
+        el('div',{style:'flex:1'}, el('label',{style:'margin:0'},'分組數（0=不分組）'),
+          el('input',{id:'c_groups',type:'number',value:'0',min:'0',max:'12'}))
+      )
+    ),
+    el('div',{style:'height:12px'}),
     el('button',{onclick:async()=>{
-      course=$('#c_course').value.trim()||'未命名課程';
-      week=$('#c_week').value||'1';
+      const course=$('#c_course').value.trim()||'未命名課程';
+      const week=$('#c_week').value||'1';
+      const groups=parseInt($('#c_groups').value)||0;
+      const strict=$('#c_strict').checked;
       const code=randCode();
-      const meta={course,week,code,createdAt:now(),status:'open'};
+      const meta={course,week,code,createdAt:now(),status:'open',checkin:'open',groups,rosterStrict:strict,pinOn:false};
       await DB.set('sessions/'+code+'/meta',meta);
+      // 解析名單
+      const lines=($('#c_roster').value||'').split(/\n+/).map(l=>l.trim()).filter(Boolean);
+      if(lines.length){
+        const roster={};
+        lines.forEach(l=>{const p=l.split(/[,，\t ]+/).map(x=>x.trim()).filter(Boolean);
+          if(p[0])roster[p[0]]={name:p[1]||p[0],group:p[2]||''};});
+        await DB.set('sessions/'+code+'/roster',roster);
+      }
       localStorage.setItem('cp_teacher_session',code);
       teacherApp();
     }},'建立課堂並產生簽到 QR')
@@ -215,62 +287,71 @@ function renderCreate(app){
 }
 
 function renderConsole(app, code){
-  let meta=null, attendance={}, questions={}, activeQ=null, view='live';
+  let meta=null, roster={}, attendance={}, questions={}, activeQ=null, pulse={}, view='live';
   const unsubs=[];
 
-  // 控制列
   const ctrl=el('div',{class:'card'},
     el('div',{class:'row'},
       el('div',{}, el('h2',{id:'h_title'},'載入中…'), el('div',{class:'muted small',id:'h_sub'},'')),
-      el('div',{style:'flex:0 0 auto;min-width:0'}, el('button',{class:'ghost',style:'width:auto',onclick:()=>{
+      el('div',{style:'flex:0 0 auto'}, el('button',{class:'ghost sm',onclick:()=>{
         if(confirm('結束本堂並回到首頁？資料仍保留在資料庫中。')){localStorage.removeItem('cp_teacher_session');teacherApp();}
       }},'結束本堂'))
     )
   );
   app.appendChild(ctrl);
 
-  // 分頁切換
   const seg=el('div',{class:'seg',style:'margin-bottom:16px'},
     el('button',{class:'active',id:'tab_live',onclick:()=>setView('live')},'即時互動'),
     el('button',{id:'tab_qr',onclick:()=>setView('qr')},'簽到 QR'),
-    el('button',{id:'tab_stats',onclick:()=>setView('stats')},'統計報表')
+    el('button',{id:'tab_stats',onclick:()=>setView('stats')},'統計報表'),
+    el('button',{id:'tab_cross',onclick:()=>setView('cross')},'跨週儀表')
   );
   app.appendChild(seg);
-
   const body=el('div',{id:'t_body'});
   app.appendChild(body);
 
   function setView(v){view=v;
-    ['live','qr','stats'].forEach(x=>$('#tab_'+x).classList.toggle('active',x===v));
-    body.__live=false;   // 重置即時互動的重建旗標，避免切回時變空白
-    draw();}
+    ['live','qr','stats','cross'].forEach(x=>$('#tab_'+x).classList.toggle('active',x===v));
+    body.__live=false; if(v==='cross')loadCross(); draw();}
 
-  // 訂閱資料
   unsubs.push(DB.onValue('sessions/'+code+'/meta',v=>{meta=v;draw();}));
+  unsubs.push(DB.onValue('sessions/'+code+'/roster',v=>{roster=v||{};draw();}));
   unsubs.push(DB.onValue('sessions/'+code+'/attendance',v=>{attendance=v||{};draw();}));
   unsubs.push(DB.onValue('sessions/'+code+'/questions',v=>{questions=v||{};draw();}));
   unsubs.push(DB.onValue('sessions/'+code+'/activeQuestion',v=>{activeQ=v;draw();}));
+  unsubs.push(DB.onValue('sessions/'+code+'/pulse',v=>{pulse=v||{};draw();}));
 
-  let timerInt=setInterval(()=>{if(view==='live')drawLive();},250);
+  let lastBeep=-1;
+  setInterval(()=>{if(view==='live')drawLive();
+    // 防代簽 PIN 旋轉顯示
+    if(view==='qr'&&meta&&meta.pinOn){const e=$('#pin_now');if(e)e.textContent=pinFor(code,pinSlot());}
+  },250);
 
   function draw(){
     if(meta){$('#h_title').textContent=meta.course+'　第 '+meta.week+' 週';
-      $('#h_sub').textContent='課堂代碼 '+code;}
+      $('#h_sub').textContent='課堂代碼 '+code+(meta.groups?('　·　分 '+meta.groups+' 組'):'');}
     if(view==='live')drawLive();
     else if(view==='qr')drawQR();
-    else drawStats();
+    else if(view==='stats')drawStats();
+    else drawCross();
   }
 
-  /* ---- 即時互動視圖 ---- */
+  /* ---- 即時互動 ---- */
   function drawLive(){
     if(view!=='live')return;
     const att=Object.entries(attendance);
-    let html=body.__live;
-    if(!html){
+    if(!body.__live){
       body.innerHTML='';
+      // 理解度儀表
+      const pcard=el('div',{class:'card',id:'pulse_card'});
       // 提問面板
       const ask=el('div',{class:'card'},
-        el('h2',{},'課堂提問（限時搶答）'),
+        el('div',{class:'row',style:'align-items:center'},
+          el('h2',{style:'margin:0'},'課堂提問'),
+          el('div',{style:'flex:0 0 auto'},
+            el('button',{class:'ghost sm',id:'mute_btn',onclick:()=>{localStorage.setItem('cp_mute',muted()?'0':'1');$('#mute_btn').textContent=muted()?'🔇 靜音中':'🔊 音效開';}},
+              muted()?'🔇 靜音中':'🔊 音效開'))
+        ),
         el('label',{},'問題內容'),
         el('textarea',{id:'q_text',placeholder:'例：請用一句話定義「管理」的四大功能之一，並舉例。'}),
         el('div',{class:'row'},
@@ -278,210 +359,302 @@ function renderConsole(app, code){
           el('div',{}, el('label',{},'題型'), (()=>{const s=el('select',{id:'q_type'});
             [['text','開放文字'],['choice','選擇 A/B/C/D'],['number','數字']].forEach(o=>s.appendChild(el('option',{value:o[0]},o[1])));return s;})())
         ),
+        el('div',{class:'row',style:'margin-top:6px'},
+          el('div',{}, el('label',{},'題庫'), (()=>{const s=el('select',{id:'bank_sel'});s.appendChild(el('option',{value:''},'— 從題庫帶出 —'));return s;})()),
+          el('div',{style:'flex:0 0 auto;display:flex;gap:8px;align-items:flex-end'},
+            el('button',{class:'ghost sm',onclick:saveToBank},'＋ 存入題庫'))
+        ),
         el('div',{style:'height:12px'}),
         el('div',{class:'row'},
-          el('button',{id:'q_go',onclick:startQuestion},'▶ 開始提問'),
-          el('button',{class:'ghost',style:'flex:0 0 auto',onclick:pickRandom},'🎲 隨機抽人')
+          el('button',{id:'q_go',onclick:()=>startQuestion('text')},'▶ 開始提問'),
+          el('button',{class:'ghost',style:'flex:0 0 auto',onclick:pickRandom},'🎲 隨機抽人'),
+          el('button',{class:'ghost',style:'flex:0 0 auto',onclick:startExit},'🎫 出場券')
         )
       );
       const live=el('div',{class:'card',id:'live_panel'});
-      const roster=el('div',{class:'card',id:'roster'});
-      body.appendChild(ask);body.appendChild(live);body.appendChild(roster);
+      const roster_c=el('div',{class:'card',id:'roster'});
+      body.appendChild(pcard);body.appendChild(ask);body.appendChild(live);body.appendChild(roster_c);
       body.__live=true;
+      refreshBankOptions();
     }
+    drawPulseGauge();
     // 出席名單
-    const roster=$('#roster');
-    roster.innerHTML='';
-    roster.appendChild(el('h2',{},'已簽到　'+att.length+' 人'));
+    const rc=$('#roster');rc.innerHTML='';
+    rc.appendChild(el('h2',{},'已簽到　'+att.length+' 人'+(Object.keys(roster).length?(' / 名單 '+Object.keys(roster).length+' 人'):'')));
     const grid=el('div',{class:'stu-grid'});
     att.sort((a,b)=>(a[1].ts||0)-(b[1].ts||0)).forEach(([id,s])=>
-      grid.appendChild(el('div',{class:'stu'}, el('span',{class:'dot'}), s.name+' ('+id+')')));
+      grid.appendChild(el('div',{class:'stu'}, el('span',{class:'dot'}), s.name+' ('+id+')',
+        s.group?el('span',{class:'chip grp'},'組'+s.group):'', s.late?el('span',{class:'chip late'},'遲到'):'')));
     if(!att.length)grid.appendChild(el('div',{class:'muted'},'尚無學生簽到，請切到「簽到 QR」分頁投影。'));
-    roster.appendChild(grid);
+    rc.appendChild(grid);
 
-    // 進行中的提問
+    // 進行中題目
     const lp=$('#live_panel');
     if(activeQ){
       const remain=Math.max(0,Math.ceil((activeQ.endAt-now())/1000));
-      const total=activeQ.seconds;
-      const ans=activeQ.answers||{};
-      const ansList=Object.entries(ans);
-      const cls=remain===0?'end':(remain<=Math.max(3,total*0.25)?'low':'run');
-      lp.classList.remove('hide');
-      lp.innerHTML='';
-      lp.appendChild(el('h2',{},'進行中：'+activeQ.text));
-      lp.appendChild(el('div',{class:'timer '+cls}, remain>0?remain+' 秒':'時間到'));
-      lp.appendChild(el('div',{class:'bar'}, el('i',{style:'width:'+(total?(remain/total*100):0)+'%'})));
+      const total=activeQ.seconds||1;
+      const ans=activeQ.answers||{};const ansList=Object.entries(ans);
+      const low=remain<=Math.max(3,total*0.25);
+      const cls=remain===0?'end':(low?'low':'run');
+      // 音效：最後5秒每秒一聲，0時長聲
+      if(activeQ.kind!=='exit'){
+        if(remain>0&&remain<=5&&remain!==lastBeep){lastBeep=remain;beep(880,0.1);}
+        if(remain===0&&lastBeep!==0){lastBeep=0;beep(440,0.4);}
+        if(remain>5)lastBeep=-1;
+      }
+      lp.classList.remove('hide');lp.innerHTML='';
+      lp.appendChild(el('h2',{}, (activeQ.kind==='exit'?'🎫 出場券：':'進行中：')+activeQ.text));
+      if(activeQ.kind!=='exit'){
+        lp.appendChild(el('div',{class:'timer '+cls}, remain>0?remain+' 秒':'時間到'));
+        lp.appendChild(el('div',{class:'bar'}, el('i',{style:'width:'+(remain/total*100)+'%'})));
+      }
       const kpi=el('div',{class:'kpi',style:'margin-top:14px'},
         el('div',{class:'box'}, el('div',{class:'n'},String(ansList.length)), el('div',{class:'l'},'已作答')),
         el('div',{class:'box'}, el('div',{class:'n'}, att.length?Math.round(ansList.length/att.length*100)+'%':'0%'), el('div',{class:'l'},'作答率')),
         el('div',{class:'box'}, el('div',{class:'n'}, String(ansList.filter(a=>a[1].intime).length)), el('div',{class:'l'},'限時內'))
       );
       lp.appendChild(kpi);
+      // 即時結果視覺化
       lp.appendChild(el('div',{style:'height:12px'}));
+      lp.appendChild(el('h3',{},'即時結果'));
+      lp.appendChild(renderViz(activeQ,ansList));
       // 答案串
+      lp.appendChild(el('div',{style:'height:6px'}));
+      const det=el('details',{}, el('summary',{},'展開逐筆答案（'+ansList.length+'）'));
       ansList.sort((a,b)=>(a[1].ts||0)-(b[1].ts||0)).forEach(([id,a])=>{
-        lp.appendChild(el('div',{class:'answer-card'},
+        det.appendChild(el('div',{class:'answer-card'},
           el('div',{class:'who'}, a.name+' ('+id+')　',
             el('span',{class:'chip '+(a.intime?'ok':'no')}, a.intime?'限時內':'逾時')),
           el('div',{class:'txt'}, a.answer||'(空白)'),
-          el('div',{class:'meta'}, fmtTime(a.ts))
-        ));
+          el('div',{class:'meta'}, fmtTime(a.ts))));
       });
+      lp.appendChild(det);
       lp.appendChild(el('div',{style:'height:8px'}));
       lp.appendChild(el('button',{class:'warn',onclick:endQuestion},'結束本題並收回'));
-    } else {
-      lp.classList.add('hide');
-    }
+    } else { lp.classList.add('hide'); }
   }
 
-  async function startQuestion(){
+  function drawPulseGauge(){
+    const pc=$('#pulse_card');if(!pc)return;
+    const vals=Object.values(pulse);
+    const ok=vals.filter(p=>p.state==='ok').length;
+    const lost=vals.filter(p=>p.state==='lost').length;
+    const tot=ok+lost;
+    pc.innerHTML='';
+    pc.appendChild(el('div',{class:'row',style:'align-items:center'},
+      el('h2',{style:'margin:0'},'即時理解度'),
+      el('button',{class:'ghost sm',style:'flex:0 0 auto',onclick:async()=>{await DB.set('sessions/'+code+'/pulse',null);}},'重置')));
+    pc.appendChild(el('div',{class:'pulse',style:'margin-top:10px'},
+      el('div',{class:'seg2 ok'}, el('div',{class:'big2',style:'color:var(--ok)'}, String(ok)), el('div',{class:'muted small'},'👍 跟得上')),
+      el('div',{class:'seg2 lost'}, el('div',{class:'big2',style:'color:var(--warn)'}, String(lost)), el('div',{class:'muted small'},'🤔 還不懂')),
+      el('div',{class:'seg2'}, el('div',{class:'big2',style:'color:var(--brand)'}, tot?Math.round(ok/tot*100)+'%':'—'), el('div',{class:'muted small'},'理解率'))
+    ));
+    if(lost>0&&tot>0&&lost/tot>=0.3)pc.appendChild(el('div',{class:'banner',style:'margin:10px 0 0'},'⚠️ 超過三成學生表示還不懂，建議放慢或補充說明。'));
+  }
+
+  function renderViz(q,ansList){
+    const wrap=el('div',{});
+    if(q.type==='choice'){
+      const counts={A:0,B:0,C:0,D:0};
+      ansList.forEach(([id,a])=>{const v=(a.answer||'').trim().toUpperCase();if(counts[v]!=null)counts[v]++;});
+      const max=Math.max(1,...Object.values(counts));
+      ['A','B','C','D'].forEach(opt=>{
+        wrap.appendChild(el('div',{class:'vbar'},
+          el('div',{class:'lab'},opt),
+          el('div',{class:'track'}, el('div',{class:'fill',style:'width:'+(counts[opt]/max*100)+'%'})),
+          el('div',{class:'cnt'}, counts[opt]+' 人')));
+      });
+    } else if(q.type==='number'){
+      const nums=ansList.map(([id,a])=>parseFloat(a.answer)).filter(n=>!isNaN(n));
+      if(!nums.length){wrap.appendChild(el('div',{class:'muted'},'尚無數字作答'));return wrap;}
+      const min=Math.min(...nums),max=Math.max(...nums),avg=nums.reduce((s,n)=>s+n,0)/nums.length;
+      wrap.appendChild(el('div',{class:'kpi'},
+        el('div',{class:'box'}, el('div',{class:'n'},avg.toFixed(1)), el('div',{class:'l'},'平均')),
+        el('div',{class:'box'}, el('div',{class:'n'},String(min)), el('div',{class:'l'},'最小')),
+        el('div',{class:'box'}, el('div',{class:'n'},String(max)), el('div',{class:'l'},'最大'))));
+    } else {
+      const texts=ansList.map(([id,a])=>a.answer||'');
+      const top=freqTop(texts,30);
+      if(!top.length){wrap.appendChild(el('div',{class:'muted'},'尚無文字作答（文字雲會在學生作答後出現）'));return wrap;}
+      const maxc=top[0][1];
+      const cloud=el('div',{class:'cloud'});
+      top.forEach(([w,c])=>{const size=14+Math.round(c/maxc*26);
+        const op=0.55+0.45*(c/maxc);
+        cloud.appendChild(el('span',{style:'font-size:'+size+'px;font-weight:800;opacity:'+op.toFixed(2)},w));});
+      wrap.appendChild(cloud);
+      wrap.appendChild(el('div',{class:'muted small',style:'margin-top:6px'},'依關鍵詞出現頻率自動產生（中文採二字詞）。'));
+    }
+    return wrap;
+  }
+
+  async function startQuestion(_t){
     const text=$('#q_text').value.trim();
     const sec=parseInt($('#q_sec').value)||30;
     const type=$('#q_type').value;
     if(!text){toast('請先輸入問題內容');return;}
     if(!Object.keys(attendance).length && !confirm('目前沒有學生簽到，仍要開始嗎？')){return;}
-    // 開始新題前，自動把上一題歸檔到統計（免去手動「結束本題」）
-    if(activeQ){
-      await DB.set('sessions/'+code+'/questions/q'+activeQ.startAt,{
-        text:activeQ.text,type:activeQ.type,seconds:activeQ.seconds,
-        startAt:activeQ.startAt,answers:activeQ.answers||{}
-      });
-    }
+    await archiveActive();
     const q={text,type,seconds:sec,startAt:now(),endAt:now()+sec*1000,status:'live'};
     await DB.set('sessions/'+code+'/activeQuestion',q);
     $('#q_text').value='';
   }
-  async function endQuestion(){
-    if(!activeQ)return;
-    // 歸檔到 questions
-    const qid='q'+(activeQ.startAt);
-    await DB.set('sessions/'+code+'/questions/'+qid,{
-      text:activeQ.text,type:activeQ.type,seconds:activeQ.seconds,
-      startAt:activeQ.startAt,answers:activeQ.answers||{}
-    });
-    await DB.set('sessions/'+code+'/activeQuestion',null);
-    toast('已收回，結果已存入統計');
+  async function startExit(){
+    const text=prompt('出場券問題（開放文字，學生不限時作答）：','今天最不懂或最想再了解的一點是？');
+    if(!text)return;
+    await archiveActive();
+    const q={text:text.trim(),type:'text',kind:'exit',seconds:0,startAt:now(),endAt:now()+86400000,status:'live'};
+    await DB.set('sessions/'+code+'/activeQuestion',q);
   }
+  async function archiveActive(){
+    if(activeQ){await DB.set('sessions/'+code+'/questions/q'+activeQ.startAt,{
+      text:activeQ.text,type:activeQ.type,kind:activeQ.kind||'q',seconds:activeQ.seconds,
+      startAt:activeQ.startAt,answers:activeQ.answers||{}});}
+  }
+  async function endQuestion(){ if(!activeQ)return; await archiveActive();
+    await DB.set('sessions/'+code+'/activeQuestion',null); toast('已收回，結果存入統計');}
   function pickRandom(){
     const ids=Object.keys(attendance);
     if(!ids.length){toast('還沒有人簽到');return;}
-    const pick=attendance[ids[Math.floor(Math.random()*ids.length)]];
-    alert('🎲 隨機抽中：\n\n'+pick.name+'　('+ids.find(i=>attendance[i]===pick)+')');
+    const id=ids[Math.floor(Math.random()*ids.length)];
+    alert('🎲 隨機抽中：\n\n'+attendance[id].name+'　('+id+')');
+  }
+  // 題庫
+  function refreshBankOptions(){
+    DB.get('sessions/'+code+'/bank').then(bank=>{
+      const sel=$('#bank_sel');if(!sel)return;
+      sel.innerHTML='';sel.appendChild(el('option',{value:''},'— 從題庫帶出 —'));
+      Object.entries(bank||{}).forEach(([bid,b])=>sel.appendChild(el('option',{value:bid},(b.type==='choice'?'[選]':b.type==='number'?'[數]':'[文]')+' '+b.text.slice(0,30))));
+      sel.onchange=()=>{const b=(bank||{})[sel.value];if(b){$('#q_text').value=b.text;$('#q_sec').value=b.seconds||30;$('#q_type').value=b.type||'text';}};
+    });
+  }
+  async function saveToBank(){
+    const text=$('#q_text').value.trim();if(!text){toast('先輸入問題內容再存入');return;}
+    await DB.push('sessions/'+code+'/bank',{text,type:$('#q_type').value,seconds:parseInt($('#q_sec').value)||30});
+    toast('已存入題庫');refreshBankOptions();
   }
 
-  /* ---- QR 視圖 ---- */
+  /* ---- 簽到 QR ---- */
   function drawQR(){
     if(view!=='qr')return;
     body.innerHTML='';
-    const isLocalFile = location.protocol==='file:';
-    const isLocalHost = ['localhost','127.0.0.1','0.0.0.0'].includes(location.hostname);
-    const override = (localStorage.getItem('cp_pub_base')||'').trim();
-    const base = override || (location.origin+location.pathname);
-    const url = base.replace(/[?#].*$/,'') + '?s=' + code;
-    const needsHost = (isLocalFile || isLocalHost) && !override;
+    const isLocalFile=location.protocol==='file:';
+    const isLocalHost=['localhost','127.0.0.1','0.0.0.0'].includes(location.hostname);
+    const override=(localStorage.getItem('cp_pub_base')||'').trim();
+    const base=override||(location.origin+location.pathname);
+    const url=base.replace(/[?#].*$/,'')+'?s='+code;
+    const needsHost=(isLocalFile||isLocalHost)&&!override;
+    const open=meta&&meta.checkin!=='closed';
 
     const card=el('div',{class:'card',style:'text-align:center'},
-      el('h2',{},'學生簽到'),
+      el('h2',{},'學生簽到　',
+        el('span',{class:'chip '+(open?'ok':'no')}, open?'開放中':'已關閉')),
       el('div',{class:'muted small'},'請學生用手機掃描，或於學生端輸入課堂代碼'),
-      el('div',{style:'height:14px'}),
+      el('div',{style:'height:12px'}),
       el('div',{class:'big'}, code),
-      el('div',{style:'height:14px'}),
+      el('div',{style:'height:12px'}),
       el('div',{id:'qrholder',class:'qrbox'}),
-      el('div',{style:'height:14px'}),
+      el('div',{style:'height:10px'}),
       el('div',{class:'muted small',style:'word-break:break-all'}, url)
     );
     body.appendChild(card);
+    if(needsHost)card.insertBefore(el('div',{class:'banner',style:'text-align:left'},
+      '⚠️ 此 QR 無法被手機掃描：你正用本機開啟。請部署到網址後再開教師端，或下方填入公開網址。'),card.children[2]);
 
-    if(needsHost){
-      card.insertBefore(el('div',{class:'banner',style:'text-align:left'},
-        '⚠️ 這個 QR 目前無法被手機掃描。你現在是用'+(isLocalFile?'本機檔案 (file://)':'localhost')+'開啟，'+
-        '手機連不到你電腦上的網頁。請先把 classpulse.html 上傳到一個網址（見指南第四節，Netlify Drop 最快），'+
-        '用那個網址重開教師端即可；或在下方暫時填入已上線的公開網址來產生可掃描的 QR。'),
-        card.children[2]);
-    }
-
-    // 公開網址覆寫（給本機測試時指向已部署的網頁）
-    body.appendChild(el('div',{class:'card'},
-      el('h3',{},'進階：自訂 QR 指向的公開網址（選用）'),
-      el('div',{class:'muted small',style:'margin-bottom:8px'},
-        '若教師端跑在本機、但網頁已部署到某網址，可填入該網址讓 QR 指過去。例：https://你的帳號.netlify.app/classpulse.html'),
-      el('input',{id:'pub_base',placeholder:'https://...../classpulse.html',value:override}),
-      el('div',{style:'height:10px'}),
+    // 簽到控制
+    const ctl=el('div',{class:'card'},
+      el('h3',{},'簽到控制'),
       el('div',{class:'row'},
-        el('button',{onclick:()=>{const v=$('#pub_base').value.trim();
-          if(v)localStorage.setItem('cp_pub_base',v);else localStorage.removeItem('cp_pub_base');
-          toast(v?'已套用，QR 已更新':'已清除，改用目前網址');drawQR();}},'套用'),
-        el('button',{class:'ghost',style:'flex:0 0 auto',onclick:()=>{localStorage.removeItem('cp_pub_base');drawQR();}},'清除')
+        el('button',{class:open?'warn':'ok',onclick:async()=>{await DB.update('sessions/'+code+'/meta',{checkin:open?'closed':'open'});}}, open?'關閉簽到':'開放簽到'),
+        el('button',{class:'ghost',onclick:async()=>{await DB.update('sessions/'+code+'/meta',{checkinUntil:now()+ (parseInt(prompt('開放幾分鐘後標記為遲到？','5'))||5)*60000});toast('已設定遲到時間窗');}},'設定遲到時間窗')
+      ),
+      el('div',{class:'row',style:'margin-top:8px;align-items:center'},
+        el('label',{style:'margin:0'}, el('input',{id:'pin_toggle',type:'checkbox',style:'width:auto;margin-right:6px',
+          ...(meta&&meta.pinOn?{checked:'checked'}:{}), onchange:async(e)=>{await DB.update('sessions/'+code+'/meta',{pinOn:e.target.checked});}}),
+          '防代簽 PIN（學生簽到需輸入螢幕上的動態碼）')
       )
+    );
+    body.appendChild(ctl);
+    if(meta&&meta.pinOn){
+      body.appendChild(el('div',{class:'card',style:'text-align:center'},
+        el('h3',{},'目前通關碼（每 20 秒更換）'),
+        el('div',{class:'big',id:'pin_now',style:'letter-spacing:8px'}, pinFor(code,pinSlot()))));
+    }
+    // 公開網址覆寫
+    body.appendChild(el('details',{},
+      el('summary',{},'進階：自訂 QR 指向的公開網址'),
+      el('div',{style:'height:8px'}),
+      el('input',{id:'pub_base',placeholder:'https://你的帳號.github.io/studentquote/',value:override}),
+      el('div',{class:'row',style:'margin-top:8px'},
+        el('button',{class:'sm',onclick:()=>{const v=$('#pub_base').value.trim();
+          if(v)localStorage.setItem('cp_pub_base',v);else localStorage.removeItem('cp_pub_base');drawQR();toast('已更新');}},'套用'),
+        el('button',{class:'ghost sm',onclick:()=>{localStorage.removeItem('cp_pub_base');drawQR();}},'清除'))
     ));
-
-    const holder=$('#qrholder');
-    new QRCode(holder,{text:url,width:240,height:240,correctLevel:QRCode.CorrectLevel.M});
+    new QRCode($('#qrholder'),{text:url,width:230,height:230,correctLevel:QRCode.CorrectLevel.M});
   }
 
-  /* ---- 統計視圖 ---- */
+  /* ---- 統計報表 ---- */
+  function allQuestions(){
+    let qs=Object.entries(questions);
+    if(activeQ)qs=qs.concat([['__active',{text:activeQ.text,type:activeQ.type,kind:activeQ.kind||'q',
+      seconds:activeQ.seconds,startAt:activeQ.startAt,answers:activeQ.answers||{}}]]);
+    return qs.sort((a,b)=>(a[1].startAt||0)-(b[1].startAt||0));
+  }
   function drawStats(){
     if(view!=='stats')return;
     body.innerHTML='';
     const att=Object.entries(attendance);
-    // 統計納入已歸檔題目 + 目前進行中的題目（即使尚未按「結束本題」）
-    let qs=Object.entries(questions);
-    if(activeQ){ qs=qs.concat([['__active',{text:activeQ.text,type:activeQ.type,
-      seconds:activeQ.seconds,startAt:activeQ.startAt,answers:activeQ.answers||{}}]]); }
-    qs=qs.sort((a,b)=>(a[1].startAt||0)-(b[1].startAt||0));
-    // 計算每位學生
+    const qsAll=allQuestions();
+    const qs=qsAll.filter(([id,q])=>q.kind!=='exit');
+    const exits=qsAll.filter(([id,q])=>q.kind==='exit');
     const rows={};
-    att.forEach(([id,s])=>{rows[id]={id,name:s.name,checkin:1,answers:0,intime:0,pts:PTS.checkin};});
-    qs.forEach(([qid,q])=>{
-      const ans=q.answers||{};
-      Object.entries(ans).forEach(([id,a])=>{
-        if(!rows[id])rows[id]={id,name:a.name,checkin:0,answers:0,intime:0,pts:0};
-        rows[id].answers++;rows[id].pts+=PTS.answer;
-        if(a.intime){rows[id].intime++;rows[id].pts+=PTS.intime;}
-      });
-    });
+    att.forEach(([id,s])=>{rows[id]={id,name:s.name,group:s.group||'',checkin:1,answers:0,intime:0,pts:PTS.checkin};});
+    qs.forEach(([qid,q])=>Object.entries(q.answers||{}).forEach(([id,a])=>{
+      if(!rows[id])rows[id]={id,name:a.name,group:'',checkin:0,answers:0,intime:0,pts:0};
+      rows[id].answers++;rows[id].pts+=PTS.answer;if(a.intime){rows[id].intime++;rows[id].pts+=PTS.intime;}}));
+    exits.forEach(([qid,q])=>Object.entries(q.answers||{}).forEach(([id,a])=>{
+      if(rows[id])rows[id].pts+=PTS.exit;}));
     const list=Object.values(rows).sort((a,b)=>b.pts-a.pts);
     const totalQ=qs.length;
     const avgRate=totalQ&&att.length?Math.round(list.reduce((s,r)=>s+r.answers,0)/(totalQ*att.length)*100):0;
 
-    // KPI
     body.appendChild(el('div',{class:'card'},
       el('h2',{},'本堂總覽　'+(meta?meta.course+' 第 '+meta.week+' 週':'')),
       el('div',{class:'kpi'},
         el('div',{class:'box'}, el('div',{class:'n'},String(att.length)), el('div',{class:'l'},'簽到人數')),
         el('div',{class:'box'}, el('div',{class:'n'},String(totalQ)), el('div',{class:'l'},'提問題數')),
         el('div',{class:'box'}, el('div',{class:'n'},avgRate+'%'), el('div',{class:'l'},'平均作答率')),
-        el('div',{class:'box'}, el('div',{class:'n'}, list[0]?list[0].name:'—'), el('div',{class:'l'},'互動之星'))
-      )
+        el('div',{class:'box'}, el('div',{class:'n'}, list[0]?list[0].name:'—'), el('div',{class:'l'},'互動之星')))
     ));
 
-    // 排行榜表
-    const tbl=el('table',{},
-      el('tr',{}, el('th',{},'#'),el('th',{},'學號'),el('th',{},'姓名'),el('th',{},'簽到'),
-        el('th',{},'作答'),el('th',{},'限時內'),el('th',{},'參與分')),
-    );
+    // 小組排行
+    if(meta&&meta.groups){
+      const g={};list.forEach(r=>{const k=r.group||'未分組';if(!g[k])g[k]={group:k,members:0,pts:0};g[k].members++;g[k].pts+=r.pts;});
+      const gl=Object.values(g).sort((a,b)=>b.pts-a.pts);
+      const gt=el('table',{}, el('tr',{},el('th',{},'#'),el('th',{},'組別'),el('th',{},'人數'),el('th',{},'總分'),el('th',{},'平均')));
+      gl.forEach((r,i)=>gt.appendChild(el('tr',{},el('td',{},String(i+1)),el('td',{},'第 '+r.group+' 組'),
+        el('td',{},String(r.members)),el('td',{},el('strong',{},String(r.pts))),el('td',{},(r.pts/r.members).toFixed(1)))));
+      body.appendChild(el('div',{class:'card'}, el('h2',{},'小組競賽排行'), el('div',{style:'height:8px'}), gt));
+    }
+
+    // 學生排行
+    const tbl=el('table',{}, el('tr',{}, el('th',{},'#'),el('th',{},'學號'),el('th',{},'姓名'),
+      meta&&meta.groups?el('th',{},'組'):'', el('th',{},'簽到'),el('th',{},'作答'),el('th',{},'限時內'),el('th',{},'參與分')));
     list.forEach((r,i)=>tbl.appendChild(el('tr',{},
       el('td',{},String(i+1)),el('td',{},r.id),el('td',{},r.name),
+      meta&&meta.groups?el('td',{},r.group||'—'):'',
       el('td',{}, r.checkin?el('span',{class:'chip ok'},'✓'):el('span',{class:'chip no'},'—')),
-      el('td',{},r.answers+' / '+totalQ),
-      el('td',{},String(r.intime)),
-      el('td',{}, el('strong',{},String(r.pts)))
-    )));
-    if(!list.length)tbl.appendChild(el('tr',{},el('td',{colspan:'7',class:'muted'},'尚無資料')));
+      el('td',{},r.answers+' / '+totalQ),el('td',{},String(r.intime)),el('td',{},el('strong',{},String(r.pts))))));
+    if(!list.length)tbl.appendChild(el('tr',{},el('td',{colspan:'8',class:'muted'},'尚無資料')));
     body.appendChild(el('div',{class:'card'},
-      el('div',{class:'row',style:'align-items:center'},
-        el('h2',{style:'margin:0'},'學生互動排行'),
-        el('button',{class:'ghost',style:'flex:0 0 auto;width:auto',onclick:()=>exportCSV(list,totalQ,meta)},'⬇ 匯出 CSV')
-      ),
-      el('div',{style:'height:10px'}), tbl
-    ));
+      el('div',{class:'row',style:'align-items:center'}, el('h2',{style:'margin:0'},'學生互動排行'),
+        el('button',{class:'ghost sm',style:'flex:0 0 auto',onclick:()=>exportCSV(list,totalQ,meta)},'⬇ 匯出 CSV')),
+      el('div',{style:'height:10px'}), tbl));
 
     // 逐題明細
     const qcard=el('div',{class:'card'}, el('h2',{},'逐題作答明細'));
     qs.forEach(([qid,q],i)=>{
       const ans=Object.entries(q.answers||{});
-      qcard.appendChild(el('h3',{style:'margin-top:14px'}, 'Q'+(i+1)+'　'+q.text+'　（'+ans.length+' 人作答）'));
+      qcard.appendChild(el('h3',{style:'margin-top:14px'}, 'Q'+(i+1)+'　'+q.text+'　（'+ans.length+' 人）'));
       const t=el('table',{}, el('tr',{},el('th',{},'學號'),el('th',{},'姓名'),el('th',{},'回答'),el('th',{},'狀態')));
       ans.sort((a,b)=>(a[1].ts||0)-(b[1].ts||0)).forEach(([id,a])=>t.appendChild(el('tr',{},
         el('td',{},id),el('td',{},a.name),el('td',{},a.answer||'(空白)'),
@@ -491,17 +664,99 @@ function renderConsole(app, code){
     });
     if(!qs.length)qcard.appendChild(el('div',{class:'muted'},'本堂尚未提問。'));
     body.appendChild(qcard);
+
+    // 出場券彙整
+    if(exits.length){
+      const ec=el('div',{class:'card'}, el('h2',{},'🎫 課堂回饋（出場券）'));
+      exits.forEach(([qid,q])=>{
+        ec.appendChild(el('h3',{style:'margin-top:12px'}, q.text));
+        Object.entries(q.answers||{}).forEach(([id,a])=>ec.appendChild(el('div',{class:'answer-card'},
+          el('div',{class:'who'}, a.name+' ('+id+')'), el('div',{class:'txt'}, a.answer||'(空白)'))));
+      });
+      body.appendChild(ec);
+    }
+  }
+
+  /* ---- 跨週儀表 ---- */
+  let crossData=null;
+  function loadCross(){crossData=null;DB.get('sessions').then(all=>{crossData=all||{};if(view==='cross')drawCross();});}
+  function drawCross(){
+    if(view!=='cross')return;
+    body.innerHTML='';
+    if(crossData===null){body.appendChild(el('div',{class:'card'},el('div',{class:'muted'},'載入中…')));return;}
+    const course=meta?meta.course:'';
+    const sessions=Object.entries(crossData).filter(([c,s])=>s&&s.meta&&s.meta.course===course)
+      .sort((a,b)=>(parseInt(a[1].meta.week)||0)-(parseInt(b[1].meta.week)||0));
+    const weeks=sessions.map(([c,s])=>s.meta.week);
+    // 彙整每位學生
+    const stu={};
+    sessions.forEach(([c,s])=>{
+      const w=s.meta.week;
+      Object.entries(s.attendance||{}).forEach(([id,a])=>{
+        if(!stu[id])stu[id]={id,name:a.name,weeks:{},checkins:0,answers:0,pts:0};
+        stu[id].name=a.name;stu[id].weeks[w]=stu[id].weeks[w]||{checkin:false,ans:0};
+        stu[id].weeks[w].checkin=true;stu[id].checkins++;stu[id].pts+=PTS.checkin;});
+      const qs=Object.values(s.questions||{});
+      if(s.activeQuestion)qs.push(s.activeQuestion);
+      qs.forEach(q=>{if((q.kind||'q')==='exit')return;Object.entries(q.answers||{}).forEach(([id,a])=>{
+        if(!stu[id])stu[id]={id,name:a.name,weeks:{},checkins:0,answers:0,pts:0};
+        stu[id].weeks[w]=stu[id].weeks[w]||{checkin:false,ans:0};
+        stu[id].weeks[w].ans++;stu[id].answers++;stu[id].pts+=PTS.answer;if(a.intime)stu[id].pts+=PTS.intime;});});
+    });
+    const list=Object.values(stu).sort((a,b)=>b.pts-a.pts);
+    const totalWeeks=weeks.length;
+
+    body.appendChild(el('div',{class:'card'},
+      el('div',{class:'row',style:'align-items:center'},
+        el('div',{}, el('h2',{style:'margin:0'},'跨週累計儀表　'+course),
+          el('div',{class:'muted small'}, totalWeeks+' 週 · '+list.length+' 位學生')),
+        el('div',{style:'flex:0 0 auto;display:flex;gap:8px'},
+          el('button',{class:'ghost sm',onclick:loadCross},'↻ 重新整理'),
+          el('button',{class:'ghost sm',onclick:()=>exportCross(list,weeks,course)},'⬇ CSV')))
+    ));
+
+    if(!sessions.length){body.appendChild(el('div',{class:'card'},el('div',{class:'muted'},'尚無同課程資料。')));return;}
+
+    const t=el('table',{});
+    const head=el('tr',{}, el('th',{},'學號'),el('th',{},'姓名'));
+    weeks.forEach(w=>head.appendChild(el('th',{style:'text-align:center'},'W'+w)));
+    head.appendChild(el('th',{},'簽到率'));head.appendChild(el('th',{},'總作答'));head.appendChild(el('th',{},'參與分'));
+    t.appendChild(head);
+    list.forEach(r=>{
+      const tr=el('tr',{}, el('td',{},r.id),el('td',{},r.name));
+      let present=0;
+      weeks.forEach(w=>{const c=r.weeks[w]&&r.weeks[w].checkin;if(c)present++;
+        tr.appendChild(el('td',{style:'text-align:center'}, c?el('span',{class:'chip ok'},(r.weeks[w].ans||0)>0?String(r.weeks[w].ans):'✓'):el('span',{class:'muted'},'·')));});
+      const rate=totalWeeks?Math.round(present/totalWeeks*100):0;
+      const hl=rate<50?'lo':(rate<80?'mid':'hi');
+      tr.appendChild(el('td',{}, el('span',{class:'heat '+hl}, rate+'%')));
+      tr.appendChild(el('td',{},String(r.answers)));
+      tr.appendChild(el('td',{}, el('strong',{},String(r.pts))));
+      t.appendChild(tr);
+    });
+    body.appendChild(el('div',{class:'card'}, el('h2',{},'參與矩陣（格內數字＝該週作答數）'),
+      el('div',{class:'muted small',style:'margin-bottom:8px'},'簽到率紅色＝低於 50%，建議關懷。'),
+      el('div',{style:'overflow-x:auto'}, t)));
   }
 }
 
 function exportCSV(list,totalQ,meta){
   let csv='﻿課程,'+(meta?meta.course:'')+',第'+(meta?meta.week:'')+'週\n';
-  csv+='排名,學號,姓名,簽到,作答題數,總題數,限時內,參與分\n';
-  list.forEach((r,i)=>{csv+=[i+1,r.id,r.name,r.checkin?'是':'否',r.answers,totalQ,r.intime,r.pts].join(',')+'\n';});
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='ClassPulse_'+(meta?meta.course:'課堂')+'_第'+(meta?meta.week:'')+'週.csv';a.click();
+  csv+='排名,學號,姓名,組別,簽到,作答題數,總題數,限時內,參與分\n';
+  list.forEach((r,i)=>{csv+=[i+1,r.id,r.name,r.group||'',r.checkin?'是':'否',r.answers,totalQ,r.intime,r.pts].join(',')+'\n';});
+  downloadCSV(csv,'ClassPulse_'+(meta?meta.course:'課堂')+'_第'+(meta?meta.week:'')+'週.csv');
 }
+function exportCross(list,weeks,course){
+  let csv='﻿跨週累計,'+course+'\n學號,姓名';
+  weeks.forEach(w=>csv+=',W'+w);
+  csv+=',簽到週數,總作答,參與分\n';
+  list.forEach(r=>{let present=0;let row=[r.id,r.name];
+    weeks.forEach(w=>{const c=r.weeks[w]&&r.weeks[w].checkin;if(c)present++;row.push(c?(r.weeks[w].ans||'V'):'');});
+    row.push(present,r.answers,r.pts);csv+=row.join(',')+'\n';});
+  downloadCSV(csv,'ClassPulse_跨週_'+course+'.csv');
+}
+function downloadCSV(csv,name){const b=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();}
 
 /* ============================================================
    學生端
@@ -512,50 +767,67 @@ function studentApp(code){
   app.appendChild(header('學生端'));
   let me=JSON.parse(localStorage.getItem('cp_student_'+code)||'null');
 
-  // 先確認課堂存在
-  DB.get('sessions/'+code+'/meta').then(meta=>{
+  Promise.all([DB.get('sessions/'+code+'/meta'),DB.get('sessions/'+code+'/roster')]).then(([meta,roster])=>{
     if(!meta){ notFound(); return; }
-    if(!me){ renderCheckin(app,code,meta); }
+    roster=roster||{};
+    if(!me){ renderCheckin(app,code,meta,roster); }
     else { renderStudent(app,code,meta,me); }
-  }).catch(err=>{ notFound('讀取資料庫失敗：'+(err&&err.message||err)); });
+  }).catch(err=>notFound('讀取資料庫失敗：'+(err&&err.message||err)));
 
   function notFound(extra){
-    const local = DB.mode==='local';
-    const card = el('div',{class:'card'},
-      el('h2',{}, local ? '無法連線到課堂（尚未設定 Firebase）' : '找不到課程資訊'),
+    const local=DB.mode==='local';
+    app.appendChild(el('div',{class:'card'},
+      el('h2',{}, local?'無法連線到課堂（尚未設定 Firebase）':'找不到課程資訊'),
       el('div',{class:'muted',style:'margin:8px 0'},
-        local
-          ? ('這個網頁目前是「本機示範模式」。在本機模式下，你手機上的資料只存在你自己的瀏覽器，'+
-             '讀不到老師另一台電腦建立的課堂——這正是你掃碼後看不到課程資訊的原因。'+
-             '要讓全班用各自的手機簽到作答，老師必須先在 index.html 填入 Firebase 設定（見指南第三節），重新上傳後即可跨裝置連線。')
-          : ('課堂代碼 '+code+' 不存在，或老師尚未開始這堂課。請確認代碼無誤，並請老師先在教師端「開始一堂新課」。')
-      ),
-      extra ? el('div',{class:'banner',style:'text-align:left'}, extra) : el('span'),
-      el('div',{style:'height:8px'}),
-      el('button',{class:'ghost',onclick:()=>studentApp(code)},'重新整理再試一次')
-    );
-    app.appendChild(card);
+        local?'此網頁為本機示範模式，讀不到老師另一台裝置的課堂。請老師設定 Firebase 後重新上傳。'
+             :('課堂代碼 '+code+' 不存在，或老師尚未開始這堂課。')),
+      extra?el('div',{class:'banner',style:'text-align:left'},extra):el('span'),
+      el('div',{style:'height:8px'}), el('button',{class:'ghost',onclick:()=>studentApp(code)},'重新整理再試')));
   }
 }
 
-function renderCheckin(app,code,meta){
+function renderCheckin(app,code,meta,roster){
+  const hasRoster=Object.keys(roster).length>0;
+  const closed=meta.checkin==='closed';
   const card=el('div',{class:'card'},
     el('h2',{}, meta.course+'　第 '+meta.week+' 週'),
-    el('div',{class:'muted small'},'請輸入學號與姓名完成簽到'),
+    el('div',{class:'muted small'}, closed?'⚠️ 老師已關閉簽到，請舉手向老師反映。':'請輸入學號完成簽到'),
     el('label',{},'學號'),
     el('input',{id:'s_id',placeholder:'例：1100001',inputmode:'numeric'}),
-    el('label',{},'姓名'),
-    el('input',{id:'s_name',placeholder:'你的姓名'}),
-    el('div',{style:'height:14px'}),
-    el('button',{onclick:async()=>{
-      const id=$('#s_id').value.trim();const name=$('#s_name').value.trim();
-      if(!id||!name){toast('請完整輸入學號與姓名');return;}
-      await DB.set('sessions/'+code+'/attendance/'+id,{name,ts:now()});
-      const me={id,name};localStorage.setItem('cp_student_'+code,JSON.stringify(me));
-      toast('簽到成功！');
-      studentApp(code);
-    }},'✓ 簽到')
+    el('label',{},'姓名'+(meta.rosterStrict?'（名單內將自動帶出）':'')),
+    el('input',{id:'s_name',placeholder:'你的姓名'})
   );
+  // 分組
+  if(meta.groups){
+    card.appendChild(el('label',{},'選擇組別'));
+    const sel=el('select',{id:'s_group'});
+    sel.appendChild(el('option',{value:''},'— 請選擇 —'));
+    for(let i=1;i<=meta.groups;i++)sel.appendChild(el('option',{value:String(i)},'第 '+i+' 組'));
+    card.appendChild(sel);
+  }
+  // 防代簽 PIN
+  if(meta.pinOn){
+    card.appendChild(el('label',{},'通關碼（看老師螢幕，4 位數）'));
+    card.appendChild(el('input',{id:'s_pin',inputmode:'numeric',placeholder:'例：0427',maxlength:'4'}));
+  }
+  card.appendChild(el('div',{style:'height:14px'}));
+  card.appendChild(el('button',{disabled:closed?'disabled':null,onclick:async()=>{
+    const id=$('#s_id').value.trim();
+    if(!id){toast('請輸入學號');return;}
+    if(meta.rosterStrict && !roster[id]){toast('此學號不在名單內，請確認');return;}
+    let name=$('#s_name').value.trim();
+    if(roster[id]&&roster[id].name)name=roster[id].name;
+    if(!name){toast('請輸入姓名');return;}
+    if(meta.pinOn){const pin=($('#s_pin')?$('#s_pin').value.trim():'');if(!pinValid(code,pin)){toast('通關碼錯誤或已過期，請看螢幕重新輸入');return;}}
+    let group=(roster[id]&&roster[id].group)||'';
+    if(meta.groups && !group){group=$('#s_group')?$('#s_group').value:'';if(!group){toast('請選擇組別');return;}}
+    const late = meta.checkinUntil && now()>meta.checkinUntil;
+    const rec={name,ts:now()}; if(group)rec.group=group; if(late)rec.late=true;
+    await DB.set('sessions/'+code+'/attendance/'+id,rec);
+    localStorage.setItem('cp_student_'+code,JSON.stringify({id,name,group}));
+    toast(late?'簽到成功（已逾時，標記遲到）':'簽到成功！');
+    studentApp(code);
+  }}, closed?'簽到已關閉':'✓ 簽到'));
   app.appendChild(card);
 }
 
@@ -563,99 +835,110 @@ function renderStudent(app,code,meta,me){
   app.appendChild(el('div',{class:'card'},
     el('div',{class:'row',style:'align-items:center'},
       el('div',{}, el('h2',{style:'margin:0'},'已簽到 ✓'),
-        el('div',{class:'muted small'}, me.name+' ('+me.id+')　·　'+meta.course+' 第 '+meta.week+' 週')),
-      el('div',{style:'flex:0 0 auto'}, el('div',{class:'chip ok',id:'my_pts'},'參與分 …'))
-    )
-  ));
+        el('div',{class:'muted small'}, me.name+' ('+me.id+')'+(me.group?'　·　第 '+me.group+' 組':'')+'　·　'+meta.course+' 第 '+meta.week+' 週')),
+      el('div',{style:'flex:0 0 auto'}, el('div',{class:'chip ok',id:'my_pts'},'參與分 …'))));
+
+  // 理解度回饋
+  const pulseCard=el('div',{class:'card'},
+    el('h3',{},'隨時讓老師知道你的狀態'),
+    el('div',{class:'pbtns'},
+      el('button',{class:'ok',id:'pb_ok',onclick:()=>setPulse('ok')},'👍 跟得上'),
+      el('button',{class:'lost',id:'pb_lost',onclick:()=>setPulse('lost')},'🤔 還不懂')));
+  app.appendChild(pulseCard);
+  let myPulse=null;
+  function setPulse(st){myPulse=st;DB.set('sessions/'+code+'/pulse/'+me.id,{state:st,ts:now()});
+    $('#pb_ok').classList.toggle('selected',st==='ok');$('#pb_lost').classList.toggle('selected',st==='lost');}
+
   const qbox=el('div',{id:'s_qbox'});
   app.appendChild(qbox);
 
-  let activeQ=null, myAnswered=false, lastQStart=null;
-  const unsubs=[];
-  unsubs.push(DB.onValue('sessions/'+code+'/activeQuestion',v=>{activeQ=v;
-    if(activeQ&&activeQ.startAt!==lastQStart){lastQStart=activeQ.startAt;myAnswered=!!(activeQ.answers&&activeQ.answers[me.id]);}
-    drawQ();}));
-  unsubs.push(DB.onValue('sessions/'+code+'/questions',v=>{updatePts(v||{});}));
-
+  let activeQ=null,lastQStart=null;
+  DB.onValue('sessions/'+code+'/activeQuestion',v=>{activeQ=v;
+    if(activeQ&&activeQ.startAt!==lastQStart){lastQStart=activeQ.startAt;}
+    drawQ();});
+  DB.onValue('sessions/'+code+'/questions',v=>updatePts(v||{}));
   setInterval(drawQ,250);
 
   function updatePts(questions){
-    let pts=PTS.checkin, ans=0;
+    let pts=PTS.checkin;
     Object.values(questions).forEach(q=>{const a=(q.answers||{})[me.id];
-      if(a){pts+=PTS.answer;ans++;if(a.intime)pts+=PTS.intime;}});
-    if(activeQ&&activeQ.answers&&activeQ.answers[me.id]){pts+=PTS.answer;ans++;if(activeQ.answers[me.id].intime)pts+=PTS.intime;}
+      if(a){if((q.kind||'q')==='exit'){pts+=PTS.exit;}else{pts+=PTS.answer;if(a.intime)pts+=PTS.intime;}}});
+    if(activeQ&&activeQ.answers&&activeQ.answers[me.id]){const a=activeQ.answers[me.id];
+      if((activeQ.kind||'q')==='exit')pts+=PTS.exit;else{pts+=PTS.answer;if(a.intime)pts+=PTS.intime;}}
     const e=$('#my_pts');if(e)e.textContent='參與分 '+pts;
   }
 
   function drawQ(){
     const box=$('#s_qbox');
     if(!activeQ){box.innerHTML='';box.appendChild(el('div',{class:'card',style:'text-align:center'},
-      el('div',{style:'font-size:40px'},'⏳'),
-      el('h2',{},'等待老師提問'),
-      el('div',{class:'muted small'},'保持專注，問題出現時會限時搶答喔！'))); return;}
+      el('div',{style:'font-size:40px'},'⏳'), el('h2',{},'等待老師提問'),
+      el('div',{class:'muted small'},'保持專注，問題出現時會限時搶答喔！'))); box.__qstart=null; return;}
 
+    const isExit=(activeQ.kind||'q')==='exit';
     const remain=Math.max(0,Math.ceil((activeQ.endAt-now())/1000));
-    const total=activeQ.seconds;
-    const ended=remain<=0;
+    const total=activeQ.seconds||1;
+    const ended=!isExit && remain<=0;
     const cls=ended?'end':(remain<=Math.max(3,total*0.25)?'low':'run');
-    const alreadyAnswered=!!(activeQ.answers&&activeQ.answers[me.id]);
+    const mine=activeQ.answers&&activeQ.answers[me.id];
 
-    if(box.__qstart!==activeQ.startAt){ // 換新題才重建表單
+    if(box.__qstart!==activeQ.startAt){
       box.__qstart=activeQ.startAt;
       box.innerHTML='';
-      const card=el('div',{class:'card'},
-        el('h2',{}, activeQ.text),
-        el('div',{class:'timer '+cls,id:'s_timer'}, remain+' 秒'),
-        el('div',{class:'bar'}, el('i',{id:'s_barfill',style:'width:100%'})),
-        el('div',{style:'height:14px'}),
-        el('div',{id:'s_inputzone'})
-      );
+      const card=el('div',{class:'card'}, el('h2',{}, (isExit?'🎫 ':'')+activeQ.text));
+      if(!isExit){card.appendChild(el('div',{class:'timer '+cls,id:'s_timer'}, remain+' 秒'));
+        card.appendChild(el('div',{class:'bar'}, el('i',{id:'s_barfill',style:'width:100%'})));}
+      card.appendChild(el('div',{style:'height:14px'}));
+      card.appendChild(el('div',{id:'s_inputzone'}));
       box.appendChild(card);
       buildInput();
     }
-    // 更新倒數
-    const t=$('#s_timer');if(t){t.textContent=ended?'時間到':remain+' 秒';t.className='timer '+cls;}
-    const bf=$('#s_barfill');if(bf)bf.style.width=(total?remain/total*100:0)+'%';
-
-    function buildInput(){
-      const zone=$('#s_inputzone');zone.innerHTML='';
-      if(alreadyAnswered||myAnswered){
-        const a=activeQ.answers[me.id];
-        zone.appendChild(el('div',{style:'text-align:center'},
-          el('div',{style:'font-size:36px'},'✅'),
-          el('h3',{style:'color:var(--ok)'},'已送出！'),
-          el('div',{class:'answer-card'}, el('div',{class:'txt'}, (a?a.answer:'')||'(空白)'),
-            el('div',{class:'meta'}, (a&&a.intime)?'限時內完成':'逾時送出'))));
-        return;
-      }
-      if(ended){
-        zone.appendChild(el('div',{style:'text-align:center'},
-          el('div',{style:'font-size:36px'},'⌛'),
-          el('h3',{style:'color:var(--bad)'},'時間已截止'),
-          el('div',{class:'muted small'},'下一題加油！')));
-        return;
-      }
-      let input;
-      if(activeQ.type==='choice'){
-        input=el('div',{class:'row',style:'flex-wrap:wrap'});
-        ['A','B','C','D'].forEach(opt=>input.appendChild(
-          el('button',{class:'ghost',onclick:()=>submit(opt)}, opt)));
-      }else{
-        const ti=el(activeQ.type==='number'?'input':'textarea',
-          activeQ.type==='number'?{id:'s_ans',type:'number',inputmode:'decimal',placeholder:'輸入數字'}:{id:'s_ans',placeholder:'輸入你的答案…'});
-        input=el('div',{}, ti, el('div',{style:'height:10px'}),
-          el('button',{onclick:()=>submit($('#s_ans').value)},'送出答案'));
-      }
-      zone.appendChild(input);
+    if(!isExit){const t=$('#s_timer');if(t){t.textContent=ended?'時間到':remain+' 秒';t.className='timer '+cls;}
+      const bf=$('#s_barfill');if(bf)bf.style.width=(remain/total*100)+'%';
+      if(ended)buildInput(); // 截止時鎖定
     }
 
+    function buildInput(){
+      const zone=$('#s_inputzone');if(!zone)return;
+      const submitted=activeQ.answers&&activeQ.answers[me.id];
+      if(ended && !submitted){
+        zone.innerHTML='';zone.appendChild(el('div',{style:'text-align:center'},
+          el('div',{style:'font-size:36px'},'⌛'), el('h3',{style:'color:var(--bad)'},'時間已截止'),
+          el('div',{class:'muted small'},'下一題加油！'))); return;}
+      zone.innerHTML='';
+      // 已送出狀態（仍可在截止前修改）
+      if(submitted){
+        const a=activeQ.answers[me.id];
+        zone.appendChild(el('div',{style:'text-align:center;margin-bottom:10px'},
+          el('div',{style:'font-size:30px'},'✅'),
+          el('h3',{style:'color:var(--ok)'}, isExit?'已送出回饋！':'已送出！'),
+          el('div',{class:'answer-card'}, el('div',{class:'txt'}, (a&&a.answer)||'(空白)'),
+            el('div',{class:'meta'}, isExit?'感謝回饋':((a&&a.intime)?'限時內完成':'逾時送出')))));
+        if(!ended && !isExit)zone.appendChild(el('button',{class:'ghost',onclick:()=>showForm(a&&a.answer)},'✎ 修改答案（截止前可改）'));
+        return;
+      }
+      showForm('');
+    }
+    function showForm(prefill){
+      const zone=$('#s_inputzone');zone.innerHTML='';
+      if(activeQ.type==='choice'){
+        const g=el('div',{class:'row',style:'flex-wrap:wrap'});
+        ['A','B','C','D'].forEach(opt=>g.appendChild(el('button',{class:'ghost',onclick:()=>submit(opt)},opt)));
+        zone.appendChild(g);
+      }else{
+        const ti=el(activeQ.type==='number'?'input':'textarea',
+          activeQ.type==='number'?{id:'s_ans',type:'number',inputmode:'decimal',placeholder:'輸入數字',value:prefill||''}
+                                  :{id:'s_ans',placeholder:'輸入你的答案…'});
+        if(activeQ.type!=='number'&&prefill)ti.value=prefill;
+        zone.appendChild(el('div',{}, ti, el('div',{style:'height:10px'}),
+          el('button',{onclick:()=>submit($('#s_ans').value)}, isExit?'送出回饋':'送出答案')));
+      }
+    }
     async function submit(val){
-      if(myAnswered)return;
-      const intime=now()<=activeQ.endAt;
-      myAnswered=true;
+      if(!isExit && now()>activeQ.endAt){toast('時間已截止');buildInput();return;}
+      const intime=isExit?true:(now()<=activeQ.endAt);
       await DB.set('sessions/'+code+'/activeQuestion/answers/'+me.id,
         {name:me.name,answer:(val==null?'':String(val)).slice(0,500),ts:now(),intime});
-      toast(intime?'已送出，限時內完成！':'已送出（逾時）');
+      toast(isExit?'已送出回饋，謝謝！':(intime?'已送出，限時內完成！':'已送出（逾時）'));
       buildInput();
     }
   }
