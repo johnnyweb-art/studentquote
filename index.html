@@ -836,7 +836,7 @@ function renderStudent(app,code,meta,me){
     el('div',{class:'row',style:'align-items:center'},
       el('div',{}, el('h2',{style:'margin:0'},'已簽到 ✓'),
         el('div',{class:'muted small'}, me.name+' ('+me.id+')'+(me.group?'　·　第 '+me.group+' 組':'')+'　·　'+meta.course+' 第 '+meta.week+' 週')),
-      el('div',{style:'flex:0 0 auto'}, el('div',{class:'chip ok',id:'my_pts'},'參與分 …'))));
+      el('div',{style:'flex:0 0 auto'}, el('div',{class:'chip ok',id:'my_pts'},'參與分 …')))));
 
   // 理解度回饋
   const pulseCard=el('div',{class:'card'},
