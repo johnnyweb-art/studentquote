@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>ClassPulse 課堂脈動 — 課堂互動系統</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --bg:#0f1226; --panel:#1a1f3d; --panel2:#232a52; --ink:#eef1ff; --muted:#9aa3cf;
+    --brand:#5b8cff; --brand2:#7b5bff; --ok:#34d399; --warn:#fbbf24; --bad:#fb7185;
+    --line:#2e3666; --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Noto Sans TC","Segoe UI",system-ui,-apple-system,sans-serif;
+    background:radial-gradient(1200px 600px at 80% -10%,#26306b 0%,transparent 60%),var(--bg);
+    color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+  a{color:var(--brand)}
+  .wrap{max-width:980px;margin:0 auto;padding:18px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.5px}
+  .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand2));
+    display:grid;place-items:center;font-size:18px}
+  .pill{font-size:12px;color:var(--muted);border:1px solid var(--line);padding:4px 10px;border-radius:999px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:16px;
+    box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .card h2{margin:0 0 12px;font-size:17px}
+  .card h3{margin:0 0 8px;font-size:14px;color:var(--muted);font-weight:600}
+  label{display:block;font-size:13px;color:var(--muted);margin:10px 0 6px}
+  input,textarea,select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink);font-size:15px;outline:none}
+  input:focus,textarea:focus{border-color:var(--brand)}
+  textarea{min-height:80px;resize:vertical}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row>*{flex:1;min-width:120px}
+  button{cursor:pointer;border:none;border-radius:12px;padding:12px 16px;font-size:15px;font-weight:700;
+    color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2));transition:.15s;width:100%}
+  button:hover{filter:brightness(1.08)}
+  button:active{transform:translateY(1px)}
+  button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  button.warn{background:linear-gradient(135deg,#f59e0b,#ef4444)}
+  button.ok{background:linear-gradient(135deg,#10b981,#059669)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+  .qrbox{background:#fff;padding:16px;border-radius:14px;display:inline-block}
+  .big{font-size:42px;font-weight:900;letter-spacing:2px;text-align:center;color:var(--brand)}
+  .muted{color:var(--muted)}
+  .small{font-size:12px}
+  .timer{font-size:64px;font-weight:900;text-align:center;line-height:1.1}
+  .timer.run{color:var(--ok)} .timer.low{color:var(--warn)} .timer.end{color:var(--bad)}
+  .bar{height:10px;background:var(--panel2);border-radius:999px;overflow:hidden;margin-top:8px}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));transition:width .9s linear}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left}
+  th{color:var(--muted);font-weight:600;font-size:12px}
+  .chip{display:inline-block;font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
+  .chip.ok{color:var(--ok);border-color:#1f6b53} .chip.no{color:var(--muted)}
+  .stu-grid{display:flex;flex-wrap:wrap;gap:8px}
+  .stu{padding:8px 12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-size:14px;
+    display:flex;align-items:center;gap:8px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--panel2);
+    border:1px solid var(--line);padding:12px 18px;border-radius:12px;font-size:14px;opacity:0;transition:.3s;z-index:50}
+  .toast.show{opacity:1}
+  .hide{display:none!important}
+  .kpi{display:flex;gap:12px;flex-wrap:wrap}
+  .kpi .box{flex:1;min-width:120px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+  .kpi .n{font-size:28px;font-weight:900;color:var(--brand)}
+  .kpi .l{font-size:12px;color:var(--muted);margin-top:4px}
+  .banner{background:#2a2140;border:1px solid #5b4a2e;color:#fbbf24;padding:10px 14px;border-radius:12px;font-size:13px;margin-bottom:14px}
+  .seg{display:flex;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:4px}
+  .seg button{flex:1;background:transparent;color:var(--muted);font-size:13px;padding:8px}
+  .seg button.active{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
+  .answer-card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}
+  .answer-card .who{font-weight:700;font-size:13px}
+  .answer-card .txt{margin-top:4px;font-size:15px}
+  .answer-card .meta{font-size:11px;color:var(--muted);margin-top:4px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   ClassPulse 課堂脈動
+   單檔課堂互動系統：QR 簽到 / 限時搶答 / 即時統計
+   作者：為 Johnny 教授 1151 管理學課程客製
+   ============================================================ */
+
+/* ---------- 1. Firebase 設定 ----------
+   到 https://console.firebase.google.com 建立專案後，
+   貼上你的設定取代下方占位字串即可啟用「多裝置即時連線」。
+   未填寫時自動進入「本機示範模式」（同一裝置多分頁可測試）。
+*/
+const firebaseConfig = {
+  apiKey: "PASTE_YOUR_API_KEY",
+  authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://PASTE_YOUR_PROJECT-default-rtdb.firebaseio.com",
+  projectId: "PASTE_YOUR_PROJECT",
+  appId: "PASTE_YOUR_APP_ID"
+};
+
+const USE_FIREBASE = !firebaseConfig.apiKey.startsWith("PASTE_");
+
+/* ---------- 2. 資料層抽象 (DB) ----------
+   提供 set/update/push/get/onValue，兩種後端共用同一介面。 */
+const DB = (function(){
+  if(USE_FIREBASE){
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    return {
+      mode:"firebase",
+      set:(p,v)=>db.ref(p).set(v),
+      update:(p,v)=>db.ref(p).update(v),
+      push:(p,v)=>{const r=db.ref(p).push();return r.set(v).then(()=>r.key);},
+      get:(p)=>db.ref(p).get().then(s=>s.val()),
+      onValue:(p,cb)=>{const ref=db.ref(p);const h=ref.on('value',s=>cb(s.val()));return ()=>ref.off('value',h);}
+    };
+  }
+  /* 本機示範模式：localStorage + BroadcastChannel(跨分頁) + 輪詢 */
+  const KEY="classpulse_local";
+  const ch = ("BroadcastChannel" in window) ? new BroadcastChannel("classpulse") : null;
+  const subs=[];
+  function read(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
+  function write(o){localStorage.setItem(KEY,JSON.stringify(o));if(ch)ch.postMessage(Date.now());notify();}
+  function getPath(o,p){return p.split('/').filter(Boolean).reduce((a,k)=>(a==null?undefined:a[k]),o);}
+  function setPath(o,p,v){const ks=p.split('/').filter(Boolean);let a=o;
+    for(let i=0;i<ks.length-1;i++){if(typeof a[ks[i]]!=='object'||a[ks[i]]==null)a[ks[i]]={};a=a[ks[i]];}
+    if(v===null)delete a[ks[ks.length-1]];else a[ks[ks.length-1]]=v;return o;}
+  function notify(){const o=read();subs.forEach(s=>{try{s.cb(getPath(o,s.path)??null)}catch(e){}});}
+  if(ch)ch.onmessage=()=>notify();
+  window.addEventListener('storage',e=>{if(e.key===KEY)notify();});
+  setInterval(notify,1200); // 保險輪詢，確保倒數同步
+  return {
+    mode:"local",
+    set:(p,v)=>{const o=read();setPath(o,p,v);write(o);return Promise.resolve();},
+    update:(p,v)=>{const o=read();Object.keys(v).forEach(k=>setPath(o,p+'/'+k,v[k]));write(o);return Promise.resolve();},
+    push:(p,v)=>{const id='k'+Date.now()+Math.floor(Math.random()*1000);const o=read();setPath(o,p+'/'+id,v);write(o);return Promise.resolve(id);},
+    get:(p)=>Promise.resolve(getPath(read(),p)??null),
+    onValue:(p,cb)=>{const s={path:p,cb};subs.push(s);cb(getPath(read(),p)??null);return ()=>{const i=subs.indexOf(s);if(i>=0)subs.splice(i,1);};}
+  };
+})();
+
+/* ---------- 3. 工具函式 ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const el=(t,a={},...kids)=>{const e=document.createElement(t);
+  for(const k in a){if(k==='class')e.className=a[k];else if(k==='html')e.innerHTML=a[k];
+  else if(k.startsWith('on'))e.addEventListener(k.slice(2),a[k]);else e.setAttribute(k,a[k]);}
+  kids.flat().forEach(c=>e.appendChild(typeof c==='string'?document.createTextNode(c):c));return e;};
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function now(){return Date.now();}
+function qparam(k){return new URLSearchParams(location.search).get(k);}
+function randCode(){return Math.random().toString(36).slice(2,7).toUpperCase();}
+function fmtTime(ts){const d=new Date(ts);return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}
+
+/* 計分規則（可調整）*/
+const PTS={checkin:1, answer:2, intime:1};
+
+/* ---------- 4. 路由：學生端 vs 教師端 ---------- */
+const sid = qparam('s');
+if(sid){ studentApp(sid); } else { teacherApp(); }
+
+/* 通用頂部 */
+function header(sub){
+  return el('div',{class:'topbar'},
+    el('div',{class:'brand'}, el('div',{class:'logo'},'⚡'), 'ClassPulse', el('span',{class:'muted small',style:'font-weight:400'},'課堂脈動')),
+    el('span',{class:'pill'}, sub + (DB.mode==='local'?' · 本機示範':' · 即時連線'))
+  );
+}
+
+/* ============================================================
+   教師端
+   ============================================================ */
+function teacherApp(){
+  const app=$('#app');
+  let session = localStorage.getItem('cp_teacher_session');
+  app.innerHTML='';
+  app.appendChild(header('教師端'));
+
+  if(DB.mode==='local'){
+    app.appendChild(el('div',{class:'banner'},
+      '目前為本機示範模式（尚未設定 Firebase）。可在同一台電腦開多個分頁模擬師生，正式跨裝置請依指南填入 Firebase 設定。'));
+  }
+
+  if(!session){ renderCreate(app); }
+  else { renderConsole(app, session); }
+}
+
+function renderCreate(app){
+  let course='', week='1';
+  const card=el('div',{class:'card'},
+    el('h2',{},'開始一堂新課'),
+    el('label',{},'課程名稱'),
+    el('input',{id:'c_course',placeholder:'例：管理學 (一)',value:'管理學'}),
+    el('label',{},'第幾週 / 節次'),
+    el('input',{id:'c_week',type:'number',value:'1',min:'1'}),
+    el('div',{style:'height:14px'}),
+    el('button',{onclick:async()=>{
+      course=$('#c_course').value.trim()||'未命名課程';
+      week=$('#c_week').value||'1';
+      const code=randCode();
+      const meta={course,week,code,createdAt:now(),status:'open'};
+      await DB.set('sessions/'+code+'/meta',meta);
+      localStorage.setItem('cp_teacher_session',code);
+      teacherApp();
+    }},'建立課堂並產生簽到 QR')
+  );
+  app.appendChild(card);
+}
+
+function renderConsole(app, code){
+  let meta=null, attendance={}, questions={}, activeQ=null, view='live';
+  const unsubs=[];
+
+  // 控制列
+  const ctrl=el('div',{class:'card'},
+    el('div',{class:'row'},
+      el('div',{}, el('h2',{id:'h_title'},'載入中…'), el('div',{class:'muted small',id:'h_sub'},'')),
+      el('div',{style:'flex:0 0 auto;min-width:0'}, el('button',{class:'ghost',style:'width:auto',onclick:()=>{
+        if(confirm('結束本堂並回到首頁？資料仍保留在資料庫中。')){localStorage.removeItem('cp_teacher_session');teacherApp();}
+      }},'結束本堂'))
+    )
+  );
+  app.appendChild(ctrl);
+
+  // 分頁切換
+  const seg=el('div',{class:'seg',style:'margin-bottom:16px'},
+    el('button',{class:'active',id:'tab_live',onclick:()=>setView('live')},'即時互動'),
+    el('button',{id:'tab_qr',onclick:()=>setView('qr')},'簽到 QR'),
+    el('button',{id:'tab_stats',onclick:()=>setView('stats')},'統計報表')
+  );
+  app.appendChild(seg);
+
+  const body=el('div',{id:'t_body'});
+  app.appendChild(body);
+
+  function setView(v){view=v;
+    ['live','qr','stats'].forEach(x=>$('#tab_'+x).classList.toggle('active',x===v));
+    draw();}
+
+  // 訂閱資料
+  unsubs.push(DB.onValue('sessions/'+code+'/meta',v=>{meta=v;draw();}));
+  unsubs.push(DB.onValue('sessions/'+code+'/attendance',v=>{attendance=v||{};draw();}));
+  unsubs.push(DB.onValue('sessions/'+code+'/questions',v=>{questions=v||{};draw();}));
+  unsubs.push(DB.onValue('sessions/'+code+'/activeQuestion',v=>{activeQ=v;draw();}));
+
+  let timerInt=setInterval(()=>{if(view==='live')drawLive();},250);
+
+  function draw(){
+    if(meta){$('#h_title').textContent=meta.course+'　第 '+meta.week+' 週';
+      $('#h_sub').textContent='課堂代碼 '+code;}
+    if(view==='live')drawLive();
+    else if(view==='qr')drawQR();
+    else drawStats();
+  }
+
+  /* ---- 即時互動視圖 ---- */
+  function drawLive(){
+    if(view!=='live')return;
+    const att=Object.entries(attendance);
+    let html=body.__live;
+    if(!html){
+      body.innerHTML='';
+      // 提問面板
+      const ask=el('div',{class:'card'},
+        el('h2',{},'課堂提問（限時搶答）'),
+        el('label',{},'問題內容'),
+        el('textarea',{id:'q_text',placeholder:'例：請用一句話定義「管理」的四大功能之一，並舉例。'}),
+        el('div',{class:'row'},
+          el('div',{}, el('label',{},'作答秒數'), el('input',{id:'q_sec',type:'number',value:'30',min:'5',max:'600'})),
+          el('div',{}, el('label',{},'題型'), (()=>{const s=el('select',{id:'q_type'});
+            [['text','開放文字'],['choice','選擇 A/B/C/D'],['number','數字']].forEach(o=>s.appendChild(el('option',{value:o[0]},o[1])));return s;})())
+        ),
+        el('div',{style:'height:12px'}),
+        el('div',{class:'row'},
+          el('button',{id:'q_go',onclick:startQuestion},'▶ 開始提問'),
+          el('button',{class:'ghost',style:'flex:0 0 auto',onclick:pickRandom},'🎲 隨機抽人')
+        )
+      );
+      const live=el('div',{class:'card',id:'live_panel'});
+      const roster=el('div',{class:'card',id:'roster'});
+      body.appendChild(ask);body.appendChild(live);body.appendChild(roster);
+      body.__live=true;
+    }
+    // 出席名單
+    const roster=$('#roster');
+    roster.innerHTML='';
+    roster.appendChild(el('h2',{},'已簽到　'+att.length+' 人'));
+    const grid=el('div',{class:'stu-grid'});
+    att.sort((a,b)=>(a[1].ts||0)-(b[1].ts||0)).forEach(([id,s])=>
+      grid.appendChild(el('div',{class:'stu'}, el('span',{class:'dot'}), s.name+' ('+id+')')));
+    if(!att.length)grid.appendChild(el('div',{class:'muted'},'尚無學生簽到，請切到「簽到 QR」分頁投影。'));
+    roster.appendChild(grid);
+
+    // 進行中的提問
+    const lp=$('#live_panel');
+    if(activeQ){
+      const remain=Math.max(0,Math.ceil((activeQ.endAt-now())/1000));
+      const total=activeQ.seconds;
+      const ans=activeQ.answers||{};
+      const ansList=Object.entries(ans);
+      const cls=remain===0?'end':(remain<=Math.max(3,total*0.25)?'low':'run');
+      lp.classList.remove('hide');
+      lp.innerHTML='';
+      lp.appendChild(el('h2',{},'進行中：'+activeQ.text));
+      lp.appendChild(el('div',{class:'timer '+cls}, remain>0?remain+' 秒':'時間到'));
+      lp.appendChild(el('div',{class:'bar'}, el('i',{style:'width:'+(total?(remain/total*100):0)+'%'})));
+      const kpi=el('div',{class:'kpi',style:'margin-top:14px'},
+        el('div',{class:'box'}, el('div',{class:'n'},String(ansList.length)), el('div',{class:'l'},'已作答')),
+        el('div',{class:'box'}, el('div',{class:'n'}, att.length?Math.round(ansList.length/att.length*100)+'%':'0%'), el('div',{class:'l'},'作答率')),
+        el('div',{class:'box'}, el('div',{class:'n'}, String(ansList.filter(a=>a[1].intime).length)), el('div',{class:'l'},'限時內'))
+      );
+      lp.appendChild(kpi);
+      lp.appendChild(el('div',{style:'height:12px'}));
+      // 答案串
+      ansList.sort((a,b)=>(a[1].ts||0)-(b[1].ts||0)).forEach(([id,a])=>{
+        lp.appendChild(el('div',{class:'answer-card'},
+          el('div',{class:'who'}, a.name+' ('+id+')　',
+            el('span',{class:'chip '+(a.intime?'ok':'no')}, a.intime?'限時內':'逾時')),
+          el('div',{class:'txt'}, a.answer||'(空白)'),
+          el('div',{class:'meta'}, fmtTime(a.ts))
+        ));
+      });
+      lp.appendChild(el('div',{style:'height:8px'}));
+      lp.appendChild(el('button',{class:'warn',onclick:endQuestion},'結束本題並收回'));
+    } else {
+      lp.classList.add('hide');
+    }
+  }
+
+  async function startQuestion(){
+    const text=$('#q_text').value.trim();
+    const sec=parseInt($('#q_sec').value)||30;
+    const type=$('#q_type').value;
+    if(!text){toast('請先輸入問題內容');return;}
+    if(!Object.keys(attendance).length && !confirm('目前沒有學生簽到，仍要開始嗎？')){return;}
+    const q={text,type,seconds:sec,startAt:now(),endAt:now()+sec*1000,status:'live'};
+    await DB.set('sessions/'+code+'/activeQuestion',q);
+    $('#q_text').value='';
+  }
+  async function endQuestion(){
+    if(!activeQ)return;
+    // 歸檔到 questions
+    const qid='q'+(activeQ.startAt);
+    await DB.set('sessions/'+code+'/questions/'+qid,{
+      text:activeQ.text,type:activeQ.type,seconds:activeQ.seconds,
+      startAt:activeQ.startAt,answers:activeQ.answers||{}
+    });
+    await DB.set('sessions/'+code+'/activeQuestion',null);
+    toast('已收回，結果已存入統計');
+  }
+  function pickRandom(){
+    const ids=Object.keys(attendance);
+    if(!ids.length){toast('還沒有人簽到');return;}
+    const pick=attendance[ids[Math.floor(Math.random()*ids.length)]];
+    alert('🎲 隨機抽中：\n\n'+pick.name+'　('+ids.find(i=>attendance[i]===pick)+')');
+  }
+
+  /* ---- QR 視圖 ---- */
+  function drawQR(){
+    if(view!=='qr')return;
+    body.innerHTML='';
+    const isLocalFile = location.protocol==='file:';
+    const isLocalHost = ['localhost','127.0.0.1','0.0.0.0'].includes(location.hostname);
+    const override = (localStorage.getItem('cp_pub_base')||'').trim();
+    const base = override || (location.origin+location.pathname);
+    const url = base.replace(/[?#].*$/,'') + '?s=' + code;
+    const needsHost = (isLocalFile || isLocalHost) && !override;
+
+    const card=el('div',{class:'card',style:'text-align:center'},
+      el('h2',{},'學生簽到'),
+      el('div',{class:'muted small'},'請學生用手機掃描，或於學生端輸入課堂代碼'),
+      el('div',{style:'height:14px'}),
+      el('div',{class:'big'}, code),
+      el('div',{style:'height:14px'}),
+      el('div',{id:'qrholder',class:'qrbox'}),
+      el('div',{style:'height:14px'}),
+      el('div',{class:'muted small',style:'word-break:break-all'}, url)
+    );
+    body.appendChild(card);
+
+    if(needsHost){
+      card.insertBefore(el('div',{class:'banner',style:'text-align:left'},
+        '⚠️ 這個 QR 目前無法被手機掃描。你現在是用'+(isLocalFile?'本機檔案 (file://)':'localhost')+'開啟，'+
+        '手機連不到你電腦上的網頁。請先把 classpulse.html 上傳到一個網址（見指南第四節，Netlify Drop 最快），'+
+        '用那個網址重開教師端即可；或在下方暫時填入已上線的公開網址來產生可掃描的 QR。'),
+        card.children[2]);
+    }
+
+    // 公開網址覆寫（給本機測試時指向已部署的網頁）
+    body.appendChild(el('div',{class:'card'},
+      el('h3',{},'進階：自訂 QR 指向的公開網址（選用）'),
+      el('div',{class:'muted small',style:'margin-bottom:8px'},
+        '若教師端跑在本機、但網頁已部署到某網址，可填入該網址讓 QR 指過去。例：https://你的帳號.netlify.app/classpulse.html'),
+      el('input',{id:'pub_base',placeholder:'https://...../classpulse.html',value:override}),
+      el('div',{style:'height:10px'}),
+      el('div',{class:'row'},
+        el('button',{onclick:()=>{const v=$('#pub_base').value.trim();
+          if(v)localStorage.setItem('cp_pub_base',v);else localStorage.removeItem('cp_pub_base');
+          toast(v?'已套用，QR 已更新':'已清除，改用目前網址');drawQR();}},'套用'),
+        el('button',{class:'ghost',style:'flex:0 0 auto',onclick:()=>{localStorage.removeItem('cp_pub_base');drawQR();}},'清除')
+      )
+    ));
+
+    const holder=$('#qrholder');
+    new QRCode(holder,{text:url,width:240,height:240,correctLevel:QRCode.CorrectLevel.M});
+  }
+
+  /* ---- 統計視圖 ---- */
+  function drawStats(){
+    if(view!=='stats')return;
+    body.innerHTML='';
+    const att=Object.entries(attendance);
+    const qs=Object.entries(questions).sort((a,b)=>(a[1].startAt||0)-(b[1].startAt||0));
+    // 計算每位學生
+    const rows={};
+    att.forEach(([id,s])=>{rows[id]={id,name:s.name,checkin:1,answers:0,intime:0,pts:PTS.checkin};});
+    qs.forEach(([qid,q])=>{
+      const ans=q.answers||{};
+      Object.entries(ans).forEach(([id,a])=>{
+        if(!rows[id])rows[id]={id,name:a.name,checkin:0,answers:0,intime:0,pts:0};
+        rows[id].answers++;rows[id].pts+=PTS.answer;
+        if(a.intime){rows[id].intime++;rows[id].pts+=PTS.intime;}
+      });
+    });
+    const list=Object.values(rows).sort((a,b)=>b.pts-a.pts);
+    const totalQ=qs.length;
+    const avgRate=totalQ&&att.length?Math.round(list.reduce((s,r)=>s+r.answers,0)/(totalQ*att.length)*100):0;
+
+    // KPI
+    body.appendChild(el('div',{class:'card'},
+      el('h2',{},'本堂總覽　'+(meta?meta.course+' 第 '+meta.week+' 週':'')),
+      el('div',{class:'kpi'},
+        el('div',{class:'box'}, el('div',{class:'n'},String(att.length)), el('div',{class:'l'},'簽到人數')),
+        el('div',{class:'box'}, el('div',{class:'n'},String(totalQ)), el('div',{class:'l'},'提問題數')),
+        el('div',{class:'box'}, el('div',{class:'n'},avgRate+'%'), el('div',{class:'l'},'平均作答率')),
+        el('div',{class:'box'}, el('div',{class:'n'}, list[0]?list[0].name:'—'), el('div',{class:'l'},'互動之星'))
+      )
+    ));
+
+    // 排行榜表
+    const tbl=el('table',{},
+      el('tr',{}, el('th',{},'#'),el('th',{},'學號'),el('th',{},'姓名'),el('th',{},'簽到'),
+        el('th',{},'作答'),el('th',{},'限時內'),el('th',{},'參與分')),
+    );
+    list.forEach((r,i)=>tbl.appendChild(el('tr',{},
+      el('td',{},String(i+1)),el('td',{},r.id),el('td',{},r.name),
+      el('td',{}, r.checkin?el('span',{class:'chip ok'},'✓'):el('span',{class:'chip no'},'—')),
+      el('td',{},r.answers+' / '+totalQ),
+      el('td',{},String(r.intime)),
+      el('td',{}, el('strong',{},String(r.pts)))
+    )));
+    if(!list.length)tbl.appendChild(el('tr',{},el('td',{colspan:'7',class:'muted'},'尚無資料')));
+    body.appendChild(el('div',{class:'card'},
+      el('div',{class:'row',style:'align-items:center'},
+        el('h2',{style:'margin:0'},'學生互動排行'),
+        el('button',{class:'ghost',style:'flex:0 0 auto;width:auto',onclick:()=>exportCSV(list,totalQ,meta)},'⬇ 匯出 CSV')
+      ),
+      el('div',{style:'height:10px'}), tbl
+    ));
+
+    // 逐題明細
+    const qcard=el('div',{class:'card'}, el('h2',{},'逐題作答明細'));
+    qs.forEach(([qid,q],i)=>{
+      const ans=Object.entries(q.answers||{});
+      qcard.appendChild(el('h3',{style:'margin-top:14px'}, 'Q'+(i+1)+'　'+q.text+'　（'+ans.length+' 人作答）'));
+      const t=el('table',{}, el('tr',{},el('th',{},'學號'),el('th',{},'姓名'),el('th',{},'回答'),el('th',{},'狀態')));
+      ans.sort((a,b)=>(a[1].ts||0)-(b[1].ts||0)).forEach(([id,a])=>t.appendChild(el('tr',{},
+        el('td',{},id),el('td',{},a.name),el('td',{},a.answer||'(空白)'),
+        el('td',{}, el('span',{class:'chip '+(a.intime?'ok':'no')}, a.intime?'限時內':'逾時')))));
+      if(!ans.length)t.appendChild(el('tr',{},el('td',{colspan:'4',class:'muted'},'無人作答')));
+      qcard.appendChild(t);
+    });
+    if(!qs.length)qcard.appendChild(el('div',{class:'muted'},'本堂尚未提問。'));
+    body.appendChild(qcard);
+  }
+}
+
+function exportCSV(list,totalQ,meta){
+  let csv='﻿課程,'+(meta?meta.course:'')+',第'+(meta?meta.week:'')+'週\n';
+  csv+='排名,學號,姓名,簽到,作答題數,總題數,限時內,參與分\n';
+  list.forEach((r,i)=>{csv+=[i+1,r.id,r.name,r.checkin?'是':'否',r.answers,totalQ,r.intime,r.pts].join(',')+'\n';});
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='ClassPulse_'+(meta?meta.course:'課堂')+'_第'+(meta?meta.week:'')+'週.csv';a.click();
+}
+
+/* ============================================================
+   學生端
+   ============================================================ */
+function studentApp(code){
+  const app=$('#app');
+  app.innerHTML='';
+  app.appendChild(header('學生端'));
+  let me=JSON.parse(localStorage.getItem('cp_student_'+code)||'null');
+
+  // 先確認課堂存在
+  DB.get('sessions/'+code+'/meta').then(meta=>{
+    if(!meta){
+      app.appendChild(el('div',{class:'card'}, el('h2',{},'找不到課堂'),
+        el('div',{class:'muted'},'課堂代碼 '+code+' 不存在或尚未開始，請向老師確認。')));
+      return;
+    }
+    if(!me){ renderCheckin(app,code,meta); }
+    else { renderStudent(app,code,meta,me); }
+  });
+}
+
+function renderCheckin(app,code,meta){
+  const card=el('div',{class:'card'},
+    el('h2',{}, meta.course+'　第 '+meta.week+' 週'),
+    el('div',{class:'muted small'},'請輸入學號與姓名完成簽到'),
+    el('label',{},'學號'),
+    el('input',{id:'s_id',placeholder:'例：1100001',inputmode:'numeric'}),
+    el('label',{},'姓名'),
+    el('input',{id:'s_name',placeholder:'你的姓名'}),
+    el('div',{style:'height:14px'}),
+    el('button',{onclick:async()=>{
+      const id=$('#s_id').value.trim();const name=$('#s_name').value.trim();
+      if(!id||!name){toast('請完整輸入學號與姓名');return;}
+      await DB.set('sessions/'+code+'/attendance/'+id,{name,ts:now()});
+      const me={id,name};localStorage.setItem('cp_student_'+code,JSON.stringify(me));
+      toast('簽到成功！');
+      studentApp(code);
+    }},'✓ 簽到')
+  );
+  app.appendChild(card);
+}
+
+function renderStudent(app,code,meta,me){
+  app.appendChild(el('div',{class:'card'},
+    el('div',{class:'row',style:'align-items:center'},
+      el('div',{}, el('h2',{style:'margin:0'},'已簽到 ✓'),
+        el('div',{class:'muted small'}, me.name+' ('+me.id+')　·　'+meta.course+' 第 '+meta.week+' 週')),
+      el('div',{style:'flex:0 0 auto'}, el('div',{class:'chip ok',id:'my_pts'},'參與分 …'))
+    )
+  ));
+  const qbox=el('div',{id:'s_qbox'});
+  app.appendChild(qbox);
+
+  let activeQ=null, myAnswered=false, lastQStart=null;
+  const unsubs=[];
+  unsubs.push(DB.onValue('sessions/'+code+'/activeQuestion',v=>{activeQ=v;
+    if(activeQ&&activeQ.startAt!==lastQStart){lastQStart=activeQ.startAt;myAnswered=!!(activeQ.answers&&activeQ.answers[me.id]);}
+    drawQ();}));
+  unsubs.push(DB.onValue('sessions/'+code+'/questions',v=>{updatePts(v||{});}));
+
+  setInterval(drawQ,250);
+
+  function updatePts(questions){
+    let pts=PTS.checkin, ans=0;
+    Object.values(questions).forEach(q=>{const a=(q.answers||{})[me.id];
+      if(a){pts+=PTS.answer;ans++;if(a.intime)pts+=PTS.intime;}});
+    if(activeQ&&activeQ.answers&&activeQ.answers[me.id]){pts+=PTS.answer;ans++;if(activeQ.answers[me.id].intime)pts+=PTS.intime;}
+    const e=$('#my_pts');if(e)e.textContent='參與分 '+pts;
+  }
+
+  function drawQ(){
+    const box=$('#s_qbox');
+    if(!activeQ){box.innerHTML='';box.appendChild(el('div',{class:'card',style:'text-align:center'},
+      el('div',{style:'font-size:40px'},'⏳'),
+      el('h2',{},'等待老師提問'),
+      el('div',{class:'muted small'},'保持專注，問題出現時會限時搶答喔！'))); return;}
+
+    const remain=Math.max(0,Math.ceil((activeQ.endAt-now())/1000));
+    const total=activeQ.seconds;
+    const ended=remain<=0;
+    const cls=ended?'end':(remain<=Math.max(3,total*0.25)?'low':'run');
+    const alreadyAnswered=!!(activeQ.answers&&activeQ.answers[me.id]);
+
+    if(box.__qstart!==activeQ.startAt){ // 換新題才重建表單
+      box.__qstart=activeQ.startAt;
+      box.innerHTML='';
+      const card=el('div',{class:'card'},
+        el('h2',{}, activeQ.text),
+        el('div',{class:'timer '+cls,id:'s_timer'}, remain+' 秒'),
+        el('div',{class:'bar'}, el('i',{id:'s_barfill',style:'width:100%'})),
+        el('div',{style:'height:14px'}),
+        el('div',{id:'s_inputzone'})
+      );
+      box.appendChild(card);
+      buildInput();
+    }
+    // 更新倒數
+    const t=$('#s_timer');if(t){t.textContent=ended?'時間到':remain+' 秒';t.className='timer '+cls;}
+    const bf=$('#s_barfill');if(bf)bf.style.width=(total?remain/total*100:0)+'%';
+
+    function buildInput(){
+      const zone=$('#s_inputzone');zone.innerHTML='';
+      if(alreadyAnswered||myAnswered){
+        const a=activeQ.answers[me.id];
+        zone.appendChild(el('div',{style:'text-align:center'},
+          el('div',{style:'font-size:36px'},'✅'),
+          el('h3',{style:'color:var(--ok)'},'已送出！'),
+          el('div',{class:'answer-card'}, el('div',{class:'txt'}, (a?a.answer:'')||'(空白)'),
+            el('div',{class:'meta'}, (a&&a.intime)?'限時內完成':'逾時送出'))));
+        return;
+      }
+      if(ended){
+        zone.appendChild(el('div',{style:'text-align:center'},
+          el('div',{style:'font-size:36px'},'⌛'),
+          el('h3',{style:'color:var(--bad)'},'時間已截止'),
+          el('div',{class:'muted small'},'下一題加油！')));
+        return;
+      }
+      let input;
+      if(activeQ.type==='choice'){
+        input=el('div',{class:'row',style:'flex-wrap:wrap'});
+        ['A','B','C','D'].forEach(opt=>input.appendChild(
+          el('button',{class:'ghost',onclick:()=>submit(opt)}, opt)));
+      }else{
+        const ti=el(activeQ.type==='number'?'input':'textarea',
+          activeQ.type==='number'?{id:'s_ans',type:'number',inputmode:'decimal',placeholder:'輸入數字'}:{id:'s_ans',placeholder:'輸入你的答案…'});
+        input=el('div',{}, ti, el('div',{style:'height:10px'}),
+          el('button',{onclick:()=>submit($('#s_ans').value)},'送出答案'));
+      }
+      zone.appendChild(input);
+    }
+
+    async function submit(val){
+      if(myAnswered)return;
+      const intime=now()<=activeQ.endAt;
+      myAnswered=true;
+      await DB.set('sessions/'+code+'/activeQuestion/answers/'+me.id,
+        {name:me.name,answer:(val==null?'':String(val)).slice(0,500),ts:now(),intime});
+      toast(intime?'已送出，限時內完成！':'已送出（逾時）');
+      buildInput();
+    }
+  }
+}
+</script>
+</body>
+</html>
