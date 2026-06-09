@@ -341,6 +341,13 @@ function renderConsole(app, code){
     const type=$('#q_type').value;
     if(!text){toast('請先輸入問題內容');return;}
     if(!Object.keys(attendance).length && !confirm('目前沒有學生簽到，仍要開始嗎？')){return;}
+    // 開始新題前，自動把上一題歸檔到統計（免去手動「結束本題」）
+    if(activeQ){
+      await DB.set('sessions/'+code+'/questions/q'+activeQ.startAt,{
+        text:activeQ.text,type:activeQ.type,seconds:activeQ.seconds,
+        startAt:activeQ.startAt,answers:activeQ.answers||{}
+      });
+    }
     const q={text,type,seconds:sec,startAt:now(),endAt:now()+sec*1000,status:'live'};
     await DB.set('sessions/'+code+'/activeQuestion',q);
     $('#q_text').value='';
@@ -418,7 +425,11 @@ function renderConsole(app, code){
     if(view!=='stats')return;
     body.innerHTML='';
     const att=Object.entries(attendance);
-    const qs=Object.entries(questions).sort((a,b)=>(a[1].startAt||0)-(b[1].startAt||0));
+    // 統計納入已歸檔題目 + 目前進行中的題目（即使尚未按「結束本題」）
+    let qs=Object.entries(questions);
+    if(activeQ){ qs=qs.concat([['__active',{text:activeQ.text,type:activeQ.type,
+      seconds:activeQ.seconds,startAt:activeQ.startAt,answers:activeQ.answers||{}}]]); }
+    qs=qs.sort((a,b)=>(a[1].startAt||0)-(b[1].startAt||0));
     // 計算每位學生
     const rows={};
     att.forEach(([id,s])=>{rows[id]={id,name:s.name,checkin:1,answers:0,intime:0,pts:PTS.checkin};});
