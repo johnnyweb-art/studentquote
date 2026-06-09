@@ -172,8 +172,9 @@ const DB = (function(){
 /* ---------- 3. 工具函式 ---------- */
 const $=(s,r=document)=>r.querySelector(s);
 const el=(t,a={},...kids)=>{const e=document.createElement(t);
-  for(const k in a){if(k==='class')e.className=a[k];else if(k==='html')e.innerHTML=a[k];
-  else if(k.startsWith('on'))e.addEventListener(k.slice(2),a[k]);else e.setAttribute(k,a[k]);}
+  for(const k in a){const v=a[k];if(v==null||v===false)continue;
+  if(k==='class')e.className=v;else if(k==='html')e.innerHTML=v;
+  else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v);}
   kids.flat().forEach(c=>e.appendChild(typeof c==='string'?document.createTextNode(c):c));return e;};
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 function now(){return Date.now();}
