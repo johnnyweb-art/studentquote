@@ -240,6 +240,7 @@ function renderConsole(app, code){
 
   function setView(v){view=v;
     ['live','qr','stats'].forEach(x=>$('#tab_'+x).classList.toggle('active',x===v));
+    body.__live=false;   // 重置即時互動的重建旗標，避免切回時變空白
     draw();}
 
   // 訂閱資料
@@ -500,14 +501,28 @@ function studentApp(code){
 
   // 先確認課堂存在
   DB.get('sessions/'+code+'/meta').then(meta=>{
-    if(!meta){
-      app.appendChild(el('div',{class:'card'}, el('h2',{},'找不到課堂'),
-        el('div',{class:'muted'},'課堂代碼 '+code+' 不存在或尚未開始，請向老師確認。')));
-      return;
-    }
+    if(!meta){ notFound(); return; }
     if(!me){ renderCheckin(app,code,meta); }
     else { renderStudent(app,code,meta,me); }
-  });
+  }).catch(err=>{ notFound('讀取資料庫失敗：'+(err&&err.message||err)); });
+
+  function notFound(extra){
+    const local = DB.mode==='local';
+    const card = el('div',{class:'card'},
+      el('h2',{}, local ? '無法連線到課堂（尚未設定 Firebase）' : '找不到課程資訊'),
+      el('div',{class:'muted',style:'margin:8px 0'},
+        local
+          ? ('這個網頁目前是「本機示範模式」。在本機模式下，你手機上的資料只存在你自己的瀏覽器，'+
+             '讀不到老師另一台電腦建立的課堂——這正是你掃碼後看不到課程資訊的原因。'+
+             '要讓全班用各自的手機簽到作答，老師必須先在 index.html 填入 Firebase 設定（見指南第三節），重新上傳後即可跨裝置連線。')
+          : ('課堂代碼 '+code+' 不存在，或老師尚未開始這堂課。請確認代碼無誤，並請老師先在教師端「開始一堂新課」。')
+      ),
+      extra ? el('div',{class:'banner',style:'text-align:left'}, extra) : el('span'),
+      el('div',{style:'height:8px'}),
+      el('button',{class:'ghost',onclick:()=>studentApp(code)},'重新整理再試一次')
+    );
+    app.appendChild(card);
+  }
 }
 
 function renderCheckin(app,code,meta){
