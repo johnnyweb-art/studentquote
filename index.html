@@ -613,13 +613,11 @@ function renderConsole(app, code){
     const qs=qsAll.filter(([id,q])=>q.kind!=='exit');
     const exits=qsAll.filter(([id,q])=>q.kind==='exit');
     const rows={};
-    att.forEach(([id,s])=>{rows[id]={id,name:s.name,group:s.group||'',checkin:1,answers:0,intime:0,pts:PTS.checkin};});
+    att.forEach(([id,s])=>{rows[id]={id,name:s.name,group:s.group||'',checkin:1,answers:0,intime:0};});
     qs.forEach(([qid,q])=>Object.entries(q.answers||{}).forEach(([id,a])=>{
-      if(!rows[id])rows[id]={id,name:a.name,group:'',checkin:0,answers:0,intime:0,pts:0};
-      rows[id].answers++;rows[id].pts+=PTS.answer;if(a.intime){rows[id].intime++;rows[id].pts+=PTS.intime;}}));
-    exits.forEach(([qid,q])=>Object.entries(q.answers||{}).forEach(([id,a])=>{
-      if(rows[id])rows[id].pts+=PTS.exit;}));
-    const list=Object.values(rows).sort((a,b)=>b.pts-a.pts);
+      if(!rows[id])rows[id]={id,name:a.name,group:'',checkin:0,answers:0,intime:0};
+      rows[id].answers++;if(a.intime)rows[id].intime++;}));
+    const list=Object.values(rows).sort((a,b)=>b.answers-a.answers||b.intime-a.intime);
     const totalQ=qs.length;
     const avgRate=totalQ&&att.length?Math.round(list.reduce((s,r)=>s+r.answers,0)/(totalQ*att.length)*100):0;
 
@@ -634,23 +632,23 @@ function renderConsole(app, code){
 
     // 小組排行
     if(meta&&meta.groups){
-      const g={};list.forEach(r=>{const k=r.group||'未分組';if(!g[k])g[k]={group:k,members:0,pts:0};g[k].members++;g[k].pts+=r.pts;});
-      const gl=Object.values(g).sort((a,b)=>b.pts-a.pts);
-      const gt=el('table',{}, el('tr',{},el('th',{},'#'),el('th',{},'組別'),el('th',{},'人數'),el('th',{},'總分'),el('th',{},'平均')));
+      const g={};list.forEach(r=>{const k=r.group||'未分組';if(!g[k])g[k]={group:k,members:0,ans:0};g[k].members++;g[k].ans+=r.answers;});
+      const gl=Object.values(g).sort((a,b)=>b.ans-a.ans);
+      const gt=el('table',{}, el('tr',{},el('th',{},'#'),el('th',{},'組別'),el('th',{},'人數'),el('th',{},'總作答次數'),el('th',{},'人均作答')));
       gl.forEach((r,i)=>gt.appendChild(el('tr',{},el('td',{},String(i+1)),el('td',{},'第 '+r.group+' 組'),
-        el('td',{},String(r.members)),el('td',{},el('strong',{},String(r.pts))),el('td',{},(r.pts/r.members).toFixed(1)))));
+        el('td',{},String(r.members)),el('td',{},el('strong',{},String(r.ans))),el('td',{},(r.ans/r.members).toFixed(1)))));
       body.appendChild(el('div',{class:'card'}, el('h2',{},'小組競賽排行'), el('div',{style:'height:8px'}), gt));
     }
 
     // 學生排行
     const tbl=el('table',{}, el('tr',{}, el('th',{},'#'),el('th',{},'學號'),el('th',{},'姓名'),
-      meta&&meta.groups?el('th',{},'組'):'', el('th',{},'簽到'),el('th',{},'作答'),el('th',{},'限時內'),el('th',{},'參與分')));
+      meta&&meta.groups?el('th',{},'組'):'', el('th',{},'簽到'),el('th',{},'作答次數'),el('th',{},'限時內')));
     list.forEach((r,i)=>tbl.appendChild(el('tr',{},
       el('td',{},String(i+1)),el('td',{},r.id),el('td',{},r.name),
       meta&&meta.groups?el('td',{},r.group||'—'):'',
       el('td',{}, r.checkin?el('span',{class:'chip ok'},'✓'):el('span',{class:'chip no'},'—')),
-      el('td',{},r.answers+' / '+totalQ),el('td',{},String(r.intime)),el('td',{},el('strong',{},String(r.pts))))));
-    if(!list.length)tbl.appendChild(el('tr',{},el('td',{colspan:'8',class:'muted'},'尚無資料')));
+      el('td',{},r.answers+' / '+totalQ),el('td',{},String(r.intime)))));
+    if(!list.length)tbl.appendChild(el('tr',{},el('td',{colspan:'7',class:'muted'},'尚無資料')));
     body.appendChild(el('div',{class:'card'},
       el('div',{class:'row',style:'align-items:center'}, el('h2',{style:'margin:0'},'學生互動排行'),
         el('button',{class:'ghost sm',style:'flex:0 0 auto',onclick:()=>exportCSV(list,totalQ,meta)},'⬇ 匯出 CSV')),
@@ -699,17 +697,17 @@ function renderConsole(app, code){
     sessions.forEach(([c,s])=>{
       const w=s.meta.week;
       Object.entries(s.attendance||{}).forEach(([id,a])=>{
-        if(!stu[id])stu[id]={id,name:a.name,weeks:{},checkins:0,answers:0,pts:0};
+        if(!stu[id])stu[id]={id,name:a.name,weeks:{},checkins:0,answers:0};
         stu[id].name=a.name;stu[id].weeks[w]=stu[id].weeks[w]||{checkin:false,ans:0};
-        stu[id].weeks[w].checkin=true;stu[id].checkins++;stu[id].pts+=PTS.checkin;});
+        stu[id].weeks[w].checkin=true;stu[id].checkins++;});
       const qs=Object.values(s.questions||{});
       if(s.activeQuestion)qs.push(s.activeQuestion);
       qs.forEach(q=>{if((q.kind||'q')==='exit')return;Object.entries(q.answers||{}).forEach(([id,a])=>{
-        if(!stu[id])stu[id]={id,name:a.name,weeks:{},checkins:0,answers:0,pts:0};
+        if(!stu[id])stu[id]={id,name:a.name,weeks:{},checkins:0,answers:0};
         stu[id].weeks[w]=stu[id].weeks[w]||{checkin:false,ans:0};
-        stu[id].weeks[w].ans++;stu[id].answers++;stu[id].pts+=PTS.answer;if(a.intime)stu[id].pts+=PTS.intime;});});
+        stu[id].weeks[w].ans++;stu[id].answers++;});});
     });
-    const list=Object.values(stu).sort((a,b)=>b.pts-a.pts);
+    const list=Object.values(stu).sort((a,b)=>b.answers-a.answers);
     const totalWeeks=weeks.length;
 
     body.appendChild(el('div',{class:'card'},
@@ -730,7 +728,7 @@ function renderConsole(app, code){
     const t=el('table',{});
     const head=el('tr',{}, el('th',{},'學號'),el('th',{},'姓名'));
     weeks.forEach(w=>head.appendChild(el('th',{style:'text-align:center'},'W'+w)));
-    head.appendChild(el('th',{},'簽到率'));head.appendChild(el('th',{},'總作答'));head.appendChild(el('th',{},'參與分'));
+    head.appendChild(el('th',{},'簽到率'));head.appendChild(el('th',{},'總作答次數'));
     t.appendChild(head);
     list.forEach(r=>{
       const tr=el('tr',{}, el('td',{},r.id),el('td',{},r.name));
@@ -740,8 +738,7 @@ function renderConsole(app, code){
       const rate=totalWeeks?Math.round(present/totalWeeks*100):0;
       const hl=rate<50?'lo':(rate<80?'mid':'hi');
       tr.appendChild(el('td',{}, el('span',{class:'heat '+hl}, rate+'%')));
-      tr.appendChild(el('td',{},String(r.answers)));
-      tr.appendChild(el('td',{}, el('strong',{},String(r.pts))));
+      tr.appendChild(el('td',{}, el('strong',{},String(r.answers))));
       t.appendChild(tr);
     });
     body.appendChild(el('div',{class:'card'}, el('h2',{},'參與矩陣（格內數字＝該週作答數）'),
@@ -752,17 +749,17 @@ function renderConsole(app, code){
 
 function exportCSV(list,totalQ,meta){
   let csv='﻿課程,'+(meta?meta.course:'')+',第'+(meta?meta.week:'')+'週\n';
-  csv+='排名,學號,姓名,組別,簽到,作答題數,總題數,限時內,參與分\n';
-  list.forEach((r,i)=>{csv+=[i+1,r.id,r.name,r.group||'',r.checkin?'是':'否',r.answers,totalQ,r.intime,r.pts].join(',')+'\n';});
+  csv+='排名,學號,姓名,組別,簽到,作答題數,總題數,限時內\n';
+  list.forEach((r,i)=>{csv+=[i+1,r.id,r.name,r.group||'',r.checkin?'是':'否',r.answers,totalQ,r.intime].join(',')+'\n';});
   downloadCSV(csv,'ClassPulse_'+(meta?meta.course:'課堂')+'_第'+(meta?meta.week:'')+'週.csv');
 }
 function exportCross(list,weeks,course){
   let csv='﻿跨週累計,'+course+'\n學號,姓名';
   weeks.forEach(w=>csv+=',W'+w);
-  csv+=',簽到週數,總作答,參與分\n';
+  csv+=',簽到週數,總作答次數\n';
   list.forEach(r=>{let present=0;let row=[r.id,r.name];
     weeks.forEach(w=>{const c=r.weeks[w]&&r.weeks[w].checkin;if(c)present++;row.push(c?(r.weeks[w].ans||'V'):'');});
-    row.push(present,r.answers,r.pts);csv+=row.join(',')+'\n';});
+    row.push(present,r.answers);csv+=row.join(',')+'\n';});
   downloadCSV(csv,'ClassPulse_跨週_'+course+'.csv');
 }
 function downloadCSV(csv,name){const b=new Blob([csv],{type:'text/csv;charset=utf-8'});
@@ -846,7 +843,7 @@ function renderStudent(app,code,meta,me){
     el('div',{class:'row',style:'align-items:center'},
       el('div',{}, el('h2',{style:'margin:0'},'已簽到 ✓'),
         el('div',{class:'muted small'}, me.name+' ('+me.id+')'+(me.group?'　·　第 '+me.group+' 組':'')+'　·　'+meta.course+' 第 '+meta.week+' 週')),
-      el('div',{style:'flex:0 0 auto'}, el('div',{class:'chip ok',id:'my_pts'},'參與分 …')))));
+      el('div',{style:'flex:0 0 auto'}, el('div',{class:'chip ok',id:'my_pts'},'作答次數 …')))));
 
   // 理解度回饋
   const pulseCard=el('div',{class:'card'},
@@ -870,12 +867,10 @@ function renderStudent(app,code,meta,me){
   setInterval(drawQ,250);
 
   function updatePts(questions){
-    let pts=PTS.checkin;
-    Object.values(questions).forEach(q=>{const a=(q.answers||{})[me.id];
-      if(a){if((q.kind||'q')==='exit'){pts+=PTS.exit;}else{pts+=PTS.answer;if(a.intime)pts+=PTS.intime;}}});
-    if(activeQ&&activeQ.answers&&activeQ.answers[me.id]){const a=activeQ.answers[me.id];
-      if((activeQ.kind||'q')==='exit')pts+=PTS.exit;else{pts+=PTS.answer;if(a.intime)pts+=PTS.intime;}}
-    const e=$('#my_pts');if(e)e.textContent='參與分 '+pts;
+    let cnt=0;
+    Object.values(questions).forEach(q=>{if((q.kind||'q')==='exit')return;if((q.answers||{})[me.id])cnt++;});
+    if(activeQ&&(activeQ.kind||'q')!=='exit'&&activeQ.answers&&activeQ.answers[me.id])cnt++;
+    const e=$('#my_pts');if(e)e.textContent='已作答 '+cnt+' 題';
   }
 
   function drawQ(){
